@@ -13,14 +13,20 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3002", "http://localhost:3003"],  # Frontend URLs
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3002",
+        "http://localhost:3003",
+        "https://hobby-recommender.vercel.app",  # Vercel domain
+        "https://hobby-recommender-khadija76767.vercel.app"  # Vercel domain with username
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Mount static files
-app.mount("/avatars", StaticFiles(directory=os.path.join("frontend", "public", "avatars")), name="avatars")
+app.mount("/avatars", StaticFiles(directory=os.path.join("avatars")), name="avatars")
 
 # Include API routes
 app.include_router(api_router, prefix="/api") 
