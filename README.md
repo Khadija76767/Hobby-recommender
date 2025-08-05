@@ -1,103 +1,63 @@
-# AI-Powered Hobby Recommender System
+# AI Hobby Recommender
 
-An advanced hobby recommendation system that helps users discover new hobbies tailored to their interests and preferences. The system combines AI, vector databases, and personalized recommendations to create a comprehensive hobby exploration experience.
+نظام ذكي لاقتراح الهوايات باستخدام الذكاء الاصطناعي. يساعد المستخدمين في اكتشاف هوايات جديدة تتناسب مع اهتماماتهم وشخصياتهم.
 
-## Features
+## المميزات الرئيسية
 
-- **Daily Hobby Generator**: New hobby suggestions daily based on user preferences
-- **Personalized Hobby Quiz**: 10-question assessment for tailored recommendations
-- **AI Hobby Assistant**: Natural language conversation about hobbies
-- **Comprehensive Hobby Database**: Structured information about diverse hobbies
-- **User Progress Tracking**: Monitor and track hobby exploration journey
+- 🤖 اقتراحات ذكية للهوايات باستخدام AI
+- 👥 التواصل مع الأصدقاء ومشاركة الهوايات
+- 📱 واجهة مستخدم سهلة وجذابة
+- 🔒 نظام تسجيل دخول آمن
+- 📝 إمكانية تخصيص الملف الشخصي
 
-## Tech Stack
+## التقنيات المستخدمة
 
-### Backend
-- FastAPI
-- FAISS Vector Database
-- OpenAI GPT Integration
-- SQLAlchemy
-- JWT Authentication
-
-### Frontend
-- React
-- Material UI
-- TypeScript
+### الواجهة الأمامية (Frontend)
+- React.js
+- Material-UI
 - Axios
 
-## Setup
+### الخادم (Backend)
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+- OpenAI API
 
-1. Clone the repository
-2. Install backend dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Set up environment variables:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configurations
-   ```
-4. Install frontend dependencies:
-   ```bash
-   cd frontend
-   npm install
-   ```
+## المتطلبات
 
-## Running the Application
+- Python 3.10+
+- Node.js 14+
+- PostgreSQL
 
-### Backend
+## التثبيت والتشغيل
+
+1. استنساخ المشروع:
+```bash
+git clone https://github.com/Khadija76767/Hobby-recommender.git
+cd Hobby-recommender
+```
+
+2. إعداد البيئة الافتراضية وتثبيت المتطلبات:
+```bash
+python -m venv venv
+source venv/bin/activate  # على Linux/Mac
+# أو
+.\venv\Scripts\activate  # على Windows
+pip install -r requirements.txt
+```
+
+3. تشغيل الخادم:
 ```bash
 uvicorn app.main:app --reload
 ```
 
-### Frontend
+4. إعداد وتشغيل الواجهة الأمامية:
 ```bash
 cd frontend
-npm run dev
+npm install
+npm start
 ```
 
-## Environment Variables
+## المساهمة
 
-Create a `.env` file with the following variables:
-```
-DATABASE_URL=postgresql://user:password@localhost/db_name
-OPENAI_API_KEY=your_openai_api_key
-JWT_SECRET_KEY=your_jwt_secret
-```
-
-## Project Structure
-
-```
-.
-├── app/
-│   ├── api/
-│   ├── core/
-│   ├── db/
-│   ├── models/
-│   └── services/
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   └── package.json
-├── alembic/
-├── requirements.txt
-└── README.md
-```
-
-## API Documentation
-
-Once the server is running, visit:
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-MIT License 
+نرحب بمساهماتكم! يرجى إنشاء fork للمشروع وتقديم pull request مع تغييراتكم. 
