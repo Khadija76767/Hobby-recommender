@@ -10,6 +10,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Health check endpoint
+@app.get("/")
+async def health_check():
+    return {"status": "healthy", "message": "AI Hobby Recommender is running!"}
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
