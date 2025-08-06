@@ -6,5 +6,5 @@ set -o errexit
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# Run database migrations
-python -m alembic upgrade head 
+# Create tables without alembic for now
+# python -m alembic upgrade head 
