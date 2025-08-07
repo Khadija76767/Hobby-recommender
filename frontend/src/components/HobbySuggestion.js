@@ -36,8 +36,14 @@ const HobbySuggestion = ({ mood }) => {
     try {
       setLoading(true);
       const response = await api.get('/api/hobbies/daily');
-      const hobbies = response.data;
-      setCurrentHobby(hobbies[0]); // Get the first hobby from the daily hobbies
+      console.log('Daily hobby response:', response.data); // Debug log
+      
+      // API returns {hobby: {...}, message: "..."}
+      if (response.data && response.data.hobby) {
+        setCurrentHobby(response.data.hobby);
+      } else {
+        console.error('No hobby data received:', response.data);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching hobby:', error);
@@ -100,13 +106,19 @@ const HobbySuggestion = ({ mood }) => {
           </Typography>
         )}
 
-        {mood && currentHobby && (
+        {mood && loading && (
+          <Typography variant="body1" sx={{ textAlign: 'center', py: 4 }}>
+            جاري تحميل هواية جديدة... ✨
+          </Typography>
+        )}
+
+        {mood && currentHobby && !loading && (
           <Card sx={{ display: 'flex', flexDirection: 'column', p: 3 }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                 <Typography variant="h5" component="h3" fontFamily="Patrick Hand">
-                {currentHobby.name}
-              </Typography>
+                  {currentHobby.name}
+                </Typography>
                 <IconButton
                   onClick={handleOpenModal}
                   sx={{ 
@@ -131,25 +143,25 @@ const HobbySuggestion = ({ mood }) => {
                     border: '1px solid rgba(255, 181, 232, 0.3)',
                   }}
                 />
-                <Chip
-                  label={`${currentHobby.skill_level} Level`}
-                  size="small"
-                  sx={{
-                    bgcolor: 'rgba(255, 181, 232, 0.1)',
-                    border: '1px solid rgba(255, 181, 232, 0.3)',
-                  }}
-                />
-                <Chip
-                  label={currentHobby.time_commitment}
-                  size="small"
-                  sx={{
-                    bgcolor: 'rgba(255, 181, 232, 0.1)',
-                    border: '1px solid rgba(255, 181, 232, 0.3)',
-                  }}
-                />
+                {currentHobby.skill_level && (
+                  <Chip
+                    label={`${currentHobby.skill_level} Level`}
+                    size="small"
+                    sx={{
+                      bgcolor: 'rgba(255, 181, 232, 0.1)',
+                      border: '1px solid rgba(255, 181, 232, 0.3)',
+                    }}
+                  />
+                )}
               </Box>
             </CardContent>
           </Card>
+        )}
+
+        {mood && !currentHobby && !loading && (
+          <Typography variant="body1" sx={{ textAlign: 'center', py: 4, color: 'error.main' }}>
+            عذراً، لم نتمكن من تحميل هواية اليوم. يرجى المحاولة مرة أخرى.
+          </Typography>
         )}
       </Paper>
 
@@ -175,52 +187,30 @@ const HobbySuggestion = ({ mood }) => {
           {currentHobby && (
             <Box sx={{ py: 2 }}>
               <Typography variant="h6" gutterBottom>
-                About this Hobby
+                About this Hobby / عن هذه الهواية
               </Typography>
               <Typography paragraph>
                 {currentHobby.description}
-              </Typography>
-
-              <Typography variant="h6" gutterBottom>
-                Getting Started Guide / دليل البدء
-              </Typography>
-              <Typography
-                component="div"
-                sx={{
-                  whiteSpace: 'pre-line',
-                  mb: 2,
-                  p: 2,
-                  bgcolor: 'rgba(255, 181, 232, 0.1)',
-                  borderRadius: 2
-                }}
-              >
-                {currentHobby.detailed_guide}
               </Typography>
 
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <Paper sx={{ p: 2, height: '100%' }}>
                     <Typography variant="subtitle1" gutterBottom>
-                      Requirements
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" paragraph>
-                      <strong>Time:</strong> {currentHobby.time_commitment}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" paragraph>
-                      <strong>Cost Level:</strong> {currentHobby.cost_level}
+                      Category / الفئة
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      <strong>Equipment:</strong> {currentHobby.equipment_needed}
+                      {currentHobby.category}
                     </Typography>
                   </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Paper sx={{ p: 2, height: '100%' }}>
                     <Typography variant="subtitle1" gutterBottom>
-                      Benefits
+                      Skill Level / المستوى
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {currentHobby.benefits}
+                      {currentHobby.skill_level || 'Beginner'}
                     </Typography>
                   </Paper>
                 </Grid>
@@ -230,7 +220,7 @@ const HobbySuggestion = ({ mood }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseModal} color="primary">
-            Close
+            Close / إغلاق
           </Button>
         </DialogActions>
       </Dialog>
