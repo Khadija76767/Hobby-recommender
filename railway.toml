@@ -2,8 +2,11 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --timeout-keep-alive 30"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
 
 [variables]
 PORT = "8000"
-RAILWAY_FORCE_REDEPLOY = "v3" 
+RAILWAY_FORCE_REDEPLOY = "v4"
+PYTHONUNBUFFERED = "1" 
