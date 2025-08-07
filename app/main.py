@@ -61,9 +61,31 @@ async def login(user: UserLogin):
         "message": "Login successful!",
         "user": {
             "email": user.email,
+            "username": "Test User",
             "id": 1
         },
         "access_token": "test_token"
+    }
+
+# Get current user endpoint
+@app.get("/api/auth/me")
+async def get_current_user():
+    return {
+        "id": 1,
+        "email": "test@example.com",
+        "username": "Test User"
+    }
+
+# Get user profile endpoint
+@app.get("/api/auth/profile")
+async def get_user_profile():
+    return {
+        "id": 1,
+        "email": "test@example.com",
+        "username": "Test User",
+        "display_name": "Test User",
+        "avatar_url": None,
+        "user_code": "TEST123"
     }
 
 # Configure CORS
