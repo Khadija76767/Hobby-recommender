@@ -19,6 +19,50 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
+# Sample hobbies data
+SAMPLE_HOBBIES = [
+    {
+        "id": 1,
+        "name": "القراءة",
+        "description": "قراءة الكتب والروايات لتوسيع المعرفة والثقافة",
+        "category": "ثقافية",
+        "difficulty": "سهل",
+        "image_url": "/assets/images/default-avatar.png"
+    },
+    {
+        "id": 2,
+        "name": "الرسم",
+        "description": "التعبير الفني من خلال الألوان والخطوط",
+        "category": "فنية",
+        "difficulty": "متوسط",
+        "image_url": "/assets/images/default-avatar.png"
+    },
+    {
+        "id": 3,
+        "name": "الطبخ",
+        "description": "تعلم وإعداد وصفات جديدة ولذيذة",
+        "category": "منزلية",
+        "difficulty": "متوسط",
+        "image_url": "/assets/images/default-avatar.png"
+    },
+    {
+        "id": 4,
+        "name": "البستنة",
+        "description": "زراعة والاعتناء بالنباتات والأزهار",
+        "category": "طبيعية",
+        "difficulty": "سهل",
+        "image_url": "/assets/images/default-avatar.png"
+    },
+    {
+        "id": 5,
+        "name": "التصوير",
+        "description": "التقاط اللحظات الجميلة والذكريات",
+        "category": "فنية",
+        "difficulty": "متوسط",
+        "image_url": "/assets/images/default-avatar.png"
+    }
+]
+
 # Health check endpoint
 @app.get("/")
 async def health_check():
@@ -86,6 +130,39 @@ async def get_user_profile():
         "display_name": "Test User",
         "avatar_url": None,
         "user_code": "TEST123"
+    }
+
+# Hobbies endpoints
+@app.get("/api/hobbies/daily")
+async def get_daily_hobby():
+    import random
+    hobby = random.choice(SAMPLE_HOBBIES)
+    return {
+        "hobby": hobby,
+        "message": "إليك اقتراح هواية اليوم!"
+    }
+
+@app.get("/api/hobbies")
+async def get_all_hobbies():
+    return {
+        "hobbies": SAMPLE_HOBBIES,
+        "total": len(SAMPLE_HOBBIES)
+    }
+
+@app.get("/api/hobbies/{hobby_id}")
+async def get_hobby_detail(hobby_id: int):
+    hobby = next((h for h in SAMPLE_HOBBIES if h["id"] == hobby_id), None)
+    if not hobby:
+        raise HTTPException(status_code=404, detail="Hobby not found")
+    return hobby
+
+@app.post("/api/hobbies/recommend")
+async def get_hobby_recommendations():
+    import random
+    recommendations = random.sample(SAMPLE_HOBBIES, min(3, len(SAMPLE_HOBBIES)))
+    return {
+        "recommendations": recommendations,
+        "message": "إليك بعض الاقتراحات المخصصة لك!"
     }
 
 # Configure CORS
