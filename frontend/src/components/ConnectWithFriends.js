@@ -40,8 +40,8 @@ const ConnectWithFriends = ({ currentHobby }) => {
           name: f.display_name || f.username,
           photoURL: f.avatar_url || '/assets/images/default-avatar.png',
           code: f.user_code,
-          hobbies: []
-        })));
+            hobbies: []
+          })));
       } catch (error) {
         console.error('Error fetching friends:', error);
         setNotification({
@@ -59,20 +59,20 @@ const ConnectWithFriends = ({ currentHobby }) => {
       const response = await api.post(`/api/auth/friends/${friendCode}`);
       const friendData = response.data;
       
-      const newFriend = {
-        id: friendData.id,
+        const newFriend = {
+          id: friendData.id,
         name: friendData.display_name || friendData.username,
-        photoURL: friendData.avatar_url || '/assets/images/default-avatar.png',
-        code: friendData.user_code,
-        hobbies: []
-      };
+          photoURL: friendData.avatar_url || '/assets/images/default-avatar.png',
+          code: friendData.user_code,
+          hobbies: []
+        };
 
-      setFriends(prev => [...prev, newFriend]);
-      setFriendCode('');
-      setNotification({
-        type: 'success',
-        message: `Added ${newFriend.name} as a friend! 🎉`,
-      });
+        setFriends(prev => [...prev, newFriend]);
+        setFriendCode('');
+        setNotification({
+          type: 'success',
+          message: `Added ${newFriend.name} as a friend! 🎉`,
+        });
     } catch (error) {
       console.error('Error adding friend:', error);
       setNotification({
@@ -84,7 +84,7 @@ const ConnectWithFriends = ({ currentHobby }) => {
 
   const handleShare = async (friend) => {
     const invitationMessage = `${currentUser.display_name} invites you to try ${currentHobby} together!`;
-    
+
     const newSharedHobby = {
       hobby: currentHobby,
       friend: friend.name,
@@ -106,13 +106,13 @@ const ConnectWithFriends = ({ currentHobby }) => {
   const confirmRemoveFriend = async () => {
     try {
       await api.delete(`/api/auth/friends/${friendToDelete.id}`);
-      const updatedFriends = friends.filter(f => f.id !== friendToDelete.id);
-      setFriends(updatedFriends);
-      
-      setNotification({
-        type: 'success',
-        message: `Removed ${friendToDelete.name} from your friends list`,
-      });
+        const updatedFriends = friends.filter(f => f.id !== friendToDelete.id);
+        setFriends(updatedFriends);
+
+        setNotification({
+          type: 'success',
+          message: `Removed ${friendToDelete.name} from your friends list`,
+        });
     } catch (error) {
       console.error('Error removing friend:', error);
       setNotification({

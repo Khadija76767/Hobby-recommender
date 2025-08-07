@@ -3,6 +3,8 @@ builder = "NIXPACKS"
 
 [deploy]
 startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/"
 
 [variables]
-PORT = "8000" 
+PORT = "8000"
+RAILWAY_FORCE_REDEPLOY = "v2" 

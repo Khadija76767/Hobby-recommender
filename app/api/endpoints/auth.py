@@ -44,40 +44,40 @@ def register(
     try:
         logger.info(f"Attempting to register user with username: {user_in.username}")
         
-        # Check if user exists
-        user = db.query(User).filter(
-            (User.username == user_in.username) | (User.email == user_in.email)
-        ).first()
-        if user:
-            if user.username == user_in.username:
+    # Check if user exists
+    user = db.query(User).filter(
+        (User.username == user_in.username) | (User.email == user_in.email)
+    ).first()
+    if user:
+        if user.username == user_in.username:
                 logger.warning(f"Registration failed: Username {user_in.username} already exists")
-                raise HTTPException(
-                    status_code=400,
-                    detail="Username already registered"
-                )
-            else:
+            raise HTTPException(
+                status_code=400,
+                detail="Username already registered"
+            )
+        else:
                 logger.warning(f"Registration failed: Email {user_in.email} already exists")
-                raise HTTPException(
-                    status_code=400,
-                    detail="Email already registered"
-                )
-        
-        # Generate unique user code
-        user_code = generate_user_code(db)
-        
-        # Create new user
-        user = User(
-            username=user_in.username,
-            email=user_in.email,
-            hashed_password=get_password_hash(user_in.password),
-            user_code=user_code,
+            raise HTTPException(
+                status_code=400,
+                detail="Email already registered"
+            )
+    
+    # Generate unique user code
+    user_code = generate_user_code(db)
+    
+    # Create new user
+    user = User(
+        username=user_in.username,
+        email=user_in.email,
+        hashed_password=get_password_hash(user_in.password),
+        user_code=user_code,
             is_active=True,
             display_name=user_in.username  # Set initial display name as username
-        )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-        
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    
         logger.info(f"Successfully registered user: {user_in.username}")
         return user.to_dict()
     except Exception as e:
