@@ -1,8 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-import os
-from app.api.routes import api_router
 
 app = FastAPI(
     title="AI Hobby Recommender",
@@ -15,23 +12,19 @@ app = FastAPI(
 async def health_check():
     return {"status": "healthy", "message": "AI Hobby Recommender is running!"}
 
+@app.get("/test")
+async def test():
+    return {"message": "Test endpoint working!"}
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3002",
-        "http://localhost:3003",
-        "https://hobby-recommender.vercel.app",  # Vercel domain
-        "https://hobby-recommender-khadija76767.vercel.app"  # Vercel domain with username
-    ],
+    allow_origins=["*"],  # Simplified for testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Mount static files
-app.mount("/avatars", StaticFiles(directory=os.path.join("avatars")), name="avatars")
-
-# Include API routes
-app.include_router(api_router, prefix="/api") 
+# Temporarily disable complex imports and routes
+# from app.api.routes import api_router
+# app.include_router(api_router, prefix="/api") 
