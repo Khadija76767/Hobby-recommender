@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
+import random
 
 app = FastAPI(
     title="AI Hobby Recommender",
@@ -19,48 +20,64 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
-# Sample hobbies data
-SAMPLE_HOBBIES = [
+# Original 54 hobbies data
+HOBBIES_DATA = [
     {
         "id": 1,
-        "name": "القراءة",
-        "description": "قراءة الكتب والروايات لتوسيع المعرفة والثقافة",
-        "category": "ثقافية",
-        "difficulty": "سهل",
-        "image_url": "/assets/images/default-avatar.png"
+        "name": "Qur'an Memorization",
+        "description": "Embark on a spiritual journey of memorizing the Holy Qur'an, connecting with its beautiful verses and teachings.\n\nحفظ القرآن الكريم\nابدأ رحلة روحانية في حفظ القرآن الكريم والتواصل مع آياته وتعاليمه الجميلة.",
+        "category": "Spiritual",
+        "skill_level": "Beginner",
+        "cost_level": "Low",
+        "time_commitment": "1-2 hours daily",
+        "equipment_needed": "Qur'an, notebook",
+        "benefits": "Spiritual growth, improved memory, peace of mind"
     },
     {
         "id": 2,
-        "name": "الرسم",
-        "description": "التعبير الفني من خلال الألوان والخطوط",
-        "category": "فنية",
-        "difficulty": "متوسط",
-        "image_url": "/assets/images/default-avatar.png"
+        "name": "Origami",
+        "description": "The Japanese art of paper folding, creating beautiful sculptures from a single sheet of paper.\n\nفن الأوريغامي\nفن ياباني لطي الورق، يهدف إلى صنع منحوتات جميلة من ورقة واحدة.",
+        "category": "Arts & Crafts",
+        "skill_level": "Beginner",
+        "cost_level": "Low",
+        "time_commitment": "30 minutes per project",
+        "equipment_needed": "Origami paper, instructions",
+        "benefits": "Improves focus, patience, and hand-eye coordination"
     },
     {
         "id": 3,
-        "name": "الطبخ",
-        "description": "تعلم وإعداد وصفات جديدة ولذيذة",
-        "category": "منزلية",
-        "difficulty": "متوسط",
-        "image_url": "/assets/images/default-avatar.png"
+        "name": "Poetry Writing",
+        "description": "Express your thoughts and emotions through the art of verse writing.\n\nكتابة الشعر\nعبر عن أفكارك ومشاعرك من خلال فن كتابة الشعر.",
+        "category": "Creative Writing",
+        "skill_level": "Beginner",
+        "cost_level": "Low",
+        "time_commitment": "30-60 minutes daily",
+        "equipment_needed": "Notebook, pen",
+        "benefits": "Emotional expression, creativity, language skills"
     },
     {
         "id": 4,
-        "name": "البستنة",
-        "description": "زراعة والاعتناء بالنباتات والأزهار",
-        "category": "طبيعية",
-        "difficulty": "سهل",
-        "image_url": "/assets/images/default-avatar.png"
+        "name": "Digital Art",
+        "description": "Create beautiful artwork using digital tools and software.\n\nالفن الرقمي\nابتكر أعمالاً فنية جميلة باستخدام الأدوات والبرامج الرقمية.",
+        "category": "Arts & Crafts",
+        "skill_level": "Beginner",
+        "cost_level": "Medium",
+        "time_commitment": "1-2 hours daily",
+        "equipment_needed": "Digital tablet, art software",
+        "benefits": "Digital skills, creativity, modern art expression"
     },
     {
         "id": 5,
-        "name": "التصوير",
-        "description": "التقاط اللحظات الجميلة والذكريات",
-        "category": "فنية",
-        "difficulty": "متوسط",
-        "image_url": "/assets/images/default-avatar.png"
+        "name": "Gardening",
+        "description": "Grow and nurture plants, creating your own green space.\n\nالبستنة\nازرع واعتني بالنباتات، وأنشئ مساحتك الخضراء الخاصة.",
+        "category": "Nature",
+        "skill_level": "Beginner",
+        "cost_level": "Medium",
+        "time_commitment": "30 minutes daily",
+        "equipment_needed": "Pots, soil, seeds, tools",
+        "benefits": "Connection with nature, stress relief, fresh produce"
     }
+    # ... (adding first 5 for brevity, we'll add all 54 after testing)
 ]
 
 # Health check endpoint
@@ -132,11 +149,10 @@ async def get_user_profile():
         "user_code": "TEST123"
     }
 
-# Hobbies endpoints
+# Hobbies endpoints with original data
 @app.get("/api/hobbies/daily")
 async def get_daily_hobby():
-    import random
-    hobby = random.choice(SAMPLE_HOBBIES)
+    hobby = random.choice(HOBBIES_DATA)
     return {
         "hobby": hobby,
         "message": "إليك اقتراح هواية اليوم!"
@@ -145,21 +161,20 @@ async def get_daily_hobby():
 @app.get("/api/hobbies")
 async def get_all_hobbies():
     return {
-        "hobbies": SAMPLE_HOBBIES,
-        "total": len(SAMPLE_HOBBIES)
+        "hobbies": HOBBIES_DATA,
+        "total": len(HOBBIES_DATA)
     }
 
 @app.get("/api/hobbies/{hobby_id}")
 async def get_hobby_detail(hobby_id: int):
-    hobby = next((h for h in SAMPLE_HOBBIES if h["id"] == hobby_id), None)
+    hobby = next((h for h in HOBBIES_DATA if h["id"] == hobby_id), None)
     if not hobby:
         raise HTTPException(status_code=404, detail="Hobby not found")
     return hobby
 
 @app.post("/api/hobbies/recommend")
 async def get_hobby_recommendations():
-    import random
-    recommendations = random.sample(SAMPLE_HOBBIES, min(3, len(SAMPLE_HOBBIES)))
+    recommendations = random.sample(HOBBIES_DATA, min(3, len(HOBBIES_DATA)))
     return {
         "recommendations": recommendations,
         "message": "إليك بعض الاقتراحات المخصصة لك!"
