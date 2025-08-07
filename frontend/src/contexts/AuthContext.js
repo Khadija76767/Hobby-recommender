@@ -2,7 +2,15 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
 // Create an axios instance with default config
-const api = axios.create();
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+console.log('API Base URL:', API_BASE_URL); // Debug log
 
 const AuthContext = createContext();
 
@@ -77,7 +85,7 @@ export function AuthProvider({ children }) {
       if (error.response) {
         // The server responded with an error
         const errorMessage = error.response.data?.detail || 'Invalid credentials';
-        return { success: false, error: errorMessage };
+      return { success: false, error: errorMessage };
       } else if (error.request) {
         // The request was made but no response was received
         return { success: false, error: 'No response from server. Please try again.' };
@@ -105,7 +113,7 @@ export function AuthProvider({ children }) {
             const errorMessage = error.response.data.detail
               .map(err => err.msg)
               .join('. ');
-            return { success: false, error: errorMessage };
+      return { success: false, error: errorMessage };
           }
         }
         // Handle other error responses
