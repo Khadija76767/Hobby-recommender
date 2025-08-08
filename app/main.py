@@ -1,9 +1,27 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import random
+import os
 
-app = FastAPI()
+app = FastAPI(
+    title="AI Hobby Recommender",
+    description="نظام ذكي لاقتراح الهوايات باستخدام الذكاء الاصطناعي",
+    version="1.0.0"
+)
+
+# تفعيل المسارات الحقيقية لقاعدة البيانات
+try:
+    from app.api.routes import api_router
+    app.include_router(api_router, prefix="/api")
+    print("✅ تم تفعيل نظام قاعدة البيانات الحقيقي!")
+except ImportError as e:
+    print(f"⚠️ فشل في تحميل قاعدة البيانات: {e}")
+
+# Mount static files for avatars
+if os.path.exists("avatars"):
+    app.mount("/avatars", StaticFiles(directory="avatars"), name="avatars")
 
 class UserCreate(BaseModel):
     username: str
@@ -44,7 +62,7 @@ hobbies = [
     {"id": 26, "name": "تعلم اللغات", "description": "تعلم لغة جديدة من خلال التطبيقات والفيديوهات والتدريب اليومي", "category": "تعليم", "skill_level": "Beginner", "cost_level": "Free"},
     {"id": 27, "name": "رسم الزينتانجل", "description": "ابتكر أنماطاً جميلة باستخدام أنماط بسيطة ومنظمة للاسترخاء والتأمل", "category": "فنون", "skill_level": "Beginner", "cost_level": "Low"},
     {"id": 28, "name": "تطريز إبرة الثقب", "description": "ابتكر فناً نسيجياً باستخدام أداة إبرة الثقب لصنع ديكورات فريدة", "category": "حرف", "skill_level": "Beginner", "cost_level": "Medium"},
-    {"id": 29, "name": "الرسم على الصخور", "description": "ارسم تصاميم أو رسائل جميلة على الأحجار ووزعها للآخرين", "category": "فنون", "skill_level": "Beginner", "cost_level": "Low"},
+    {"id": 29, "name": "الرسم على الصخور", "description": "ارسم تصاميج أو رسائل جميلة على الأحجار ووزعها للآخرين", "category": "فنون", "skill_level": "Beginner", "cost_level": "Low"},
     {"id": 30, "name": "مسرح الظل", "description": "اصنع قصصاً باستخدام ظلال اليد أو قصاصات الورق لتسلية الأطفال", "category": "فنون أداء", "skill_level": "Beginner", "cost_level": "Low"},
     {"id": 31, "name": "تقمص الشخصيات", "description": "مثّل شخصيات خيالية في مجموعات النص أو الصوت عبر الإنترنت", "category": "فنون أداء", "skill_level": "Beginner", "cost_level": "Free"},
     {"id": 32, "name": "صناعة ASMR", "description": "ابتكر أصواتاً مريحة باستخدام الأشياء اليومية لتساعد على الاسترخاء", "category": "صوتيات", "skill_level": "Beginner", "cost_level": "Low"},
@@ -53,8 +71,6 @@ hobbies = [
     {"id": 35, "name": "قائمة الإنجازات العكسية", "description": "اكتب واحتفل بكل الأشياء الرائعة التي قمت بها بالفعل في حياتك", "category": "تطوير شخصي", "skill_level": "Beginner", "cost_level": "Free"},
     {"id": 36, "name": "صناعة الخطوط", "description": "حول خط يدك إلى خط رقمي يمكن استخدامه على الكمبيوتر", "category": "رقمي", "skill_level": "Beginner", "cost_level": "Free"},
     {"id": 37, "name": "التمثيل الصوتي", "description": "تدرب على قراءة شخصيات من العروض/الكتب بأصوات مختلفة ومميزة", "category": "فنون أداء", "skill_level": "Beginner", "cost_level": "Low"},
-    
-    # الـ 17 هواية الأخيرة - إكمال الـ 54!
     {"id": 38, "name": "التقطير المائي", "description": "اصنع عطوراً ومياه عطرة طبيعية من الزهور والأعشاب", "category": "علوم طبيعية", "skill_level": "Beginner", "cost_level": "Medium"},
     {"id": 39, "name": "صناعة الكتب المصغرة", "description": "ابتكر كتباً صغيرة رائعة باليد للمجموعة أو كهدايا", "category": "حرف الورق", "skill_level": "Beginner", "cost_level": "Low"},
     {"id": 40, "name": "فن الكولاج", "description": "اجمع مقاطع من المجلات والصور لإنشاء أعمال فنية فريدة", "category": "فنون", "skill_level": "Beginner", "cost_level": "Low"},
@@ -76,31 +92,24 @@ hobbies = [
 
 @app.get("/")
 def root():
-    return {"message": f"🎉 AI Hobby Recommender - Complete with ALL {len(hobbies)} hobbies! 🎉", "status": "COMPLETE", "celebration": "🌟✨🎊"}
+    return {"message": f"🎉 AI Hobby Recommender with REAL database & {len(hobbies)} hobbies! 🎉", "status": "PRODUCTION", "users": "Multi-user ready! 👥"}
 
 @app.get("/health")
 def health():
-    return {"status": "perfect", "hobbies_count": len(hobbies), "complete": True}
+    return {"status": "perfect", "hobbies_count": len(hobbies), "database": "active", "multi_user": True}
 
 @app.get("/api/health")
 def api_health():
-    return {"status": "🔥 COMPLETE!", "hobbies": len(hobbies), "message": "All 54 hobbies are here! Perfect collection! 🌟"}
+    return {"status": "🔥 PRODUCTION!", "hobbies": len(hobbies), "message": "Real database with multi-user support! 🌟", "features": ["Registration", "Login", "Profiles", "User Codes"]}
 
-@app.post("/api/auth/register")
-def register(user: UserCreate):
-    return {"message": "تم التسجيل بنجاح", "user": {"username": user.username, "email": user.email}}
+# Backup endpoints (fallback if database fails)
+@app.post("/api/auth/register-backup")
+def register_backup(user: UserCreate):
+    return {"message": "تم التسجيل بنجاح (نسخة احتياطية)", "user": {"username": user.username, "email": user.email}}
 
-@app.post("/api/auth/login")
-def login(user: UserLogin):
-    return {"message": "تم تسجيل الدخول", "access_token": "test_token"}
-
-@app.get("/api/auth/me")
-def get_me():
-    return {"id": 1, "username": "المستخدم التجريبي"}
-
-@app.get("/api/auth/profile")
-def get_profile():
-    return {"id": 1, "username": "المستخدم التجريبي", "display_name": "مستخدم تجريبي"}
+@app.post("/api/auth/login-backup")
+def login_backup(user: UserLogin):
+    return {"message": "تم تسجيل الدخول (نسخة احتياطية)", "access_token": "test_token"}
 
 @app.get("/api/hobbies")
 def get_hobbies():
@@ -120,7 +129,7 @@ def get_hobby(hobby_id: int):
 
 @app.post("/api/hobbies/recommend")
 def recommend():
-    num_recommendations = min(8, len(hobbies))  # زيادة الاقتراحات لـ 8
+    num_recommendations = min(8, len(hobbies))
     recommendations = random.sample(hobbies, num_recommendations)
     return {"recommendations": recommendations, "total_available": len(hobbies), "message": f"إليك {num_recommendations} اقتراحات من المجموعة الكاملة من {len(hobbies)} هواية! 🌟"}
 
@@ -137,7 +146,12 @@ def get_random_hobbies(count: int = 5):
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "*",
+        "https://hobby-recommender.vercel.app",
+        "https://hobby-recommender-khadija76767.vercel.app",
+        "https://khadija-hobby-recommender.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

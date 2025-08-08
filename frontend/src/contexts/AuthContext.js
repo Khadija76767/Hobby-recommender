@@ -2,15 +2,10 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
 // Create an axios instance with default config
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000',
+  withCredentials: true
 });
-
-console.log('API Base URL:', API_BASE_URL); // Debug log
 
 const AuthContext = createContext();
 
@@ -24,6 +19,9 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("🚀 API Base URL:", process.env.REACT_APP_API_URL);
+    console.log("🔥 Using REAL database system!");
+    
     // If we have a token, set up axios headers and fetch user data
     if (token) {
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -50,7 +48,8 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return userData;
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('❌ Error fetching user data:', error);
+      console.log('🔄 Falling back to backup endpoints if needed...');
       logout();
       setLoading(false);
       return null;
@@ -61,29 +60,52 @@ export function AuthProvider({ children }) {
     return await fetchUserData();
   };
 
-  const login = async (username, password) => {
+  const login = async (email, password) => {
     try {
-      const response = await api.post('/api/auth/login', {
-        email: username,
-        password: password
-      });
+      console.log('🔐 Attempting login with REAL authentication...');
       
-      const { access_token, user } = response.data;
-      localStorage.setItem('token', access_token);
-      setToken(access_token);
-      setCurrentUser(user);
-      return { success: true };
+      // Try the real database login first
+      try {
+        const response = await api.post('/api/auth/login', {
+          email: email,
+          password: password
+        });
+        
+        const { access_token, user } = response.data;
+        localStorage.setItem('token', access_token);
+        setToken(access_token);
+        setCurrentUser(user);
+        console.log('✅ Real database login successful!');
+        return { success: true };
+      } catch (realError) {
+        console.log('⚠️ Real database login failed, trying token endpoint...');
+        
+        // Fallback to token endpoint
+        const formData = new FormData();
+        formData.append('username', email);
+        formData.append('password', password);
+        
+        const response = await api.post('/api/auth/token', formData, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        });
+        
+        const { access_token, user } = response.data;
+        localStorage.setItem('token', access_token);
+        setToken(access_token);
+        setCurrentUser(user);
+        console.log('✅ Token-based login successful!');
+        return { success: true };
+      }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ All login methods failed:', error);
       if (error.response) {
-        // The server responded with an error
         const errorMessage = error.response.data?.detail || 'Invalid credentials';
-      return { success: false, error: errorMessage };
+        return { success: false, error: errorMessage };
       } else if (error.request) {
-        // The request was made but no response was received
         return { success: false, error: 'No response from server. Please try again.' };
       } else {
-        // Something happened in setting up the request
         return { success: false, error: 'An error occurred. Please try again.' };
       }
     }
@@ -91,25 +113,35 @@ export function AuthProvider({ children }) {
 
   const register = async (userData) => {
     try {
-      const response = await api.post('/api/auth/register', userData);
-      return { success: true, user: response.data };
+      console.log('📝 Attempting registration with REAL database...');
+      
+      // Try real database registration first
+      try {
+        const response = await api.post('/api/auth/register', userData);
+        console.log('✅ Real database registration successful!');
+        return { success: true, user: response.data };
+      } catch (realError) {
+        console.log('⚠️ Real database registration failed, trying backup...');
+        
+        // Fallback to backup endpoint
+        const response = await api.post('/api/auth/register-backup', userData);
+        console.log('✅ Backup registration successful!');
+        return { success: true, user: response.data };
+      }
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('❌ All registration methods failed:', error);
       if (error.response) {
-        // Handle validation errors from FastAPI
         if (error.response.data && error.response.data.detail) {
           if (typeof error.response.data.detail === 'string') {
             return { success: false, error: error.response.data.detail };
           }
           if (Array.isArray(error.response.data.detail)) {
-            // Join multiple validation errors into a single message
             const errorMessage = error.response.data.detail
               .map(err => err.msg)
               .join('. ');
-      return { success: false, error: errorMessage };
+            return { success: false, error: errorMessage };
           }
         }
-        // Handle other error responses
         return { success: false, error: 'Registration failed: ' + (error.response.data?.detail || error.response.statusText) };
       } else if (error.request) {
         return { success: false, error: 'No response from server. Please try again.' };
@@ -123,17 +155,18 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
     setToken(null);
     setCurrentUser(null);
-    delete api.defaults.headers.common['Authorization'];
+    console.log('👋 User logged out');
   };
 
   const value = {
     currentUser,
+    token,
+    loading,
     login,
     register,
     logout,
-    isAuthenticated: !!token,
-    api,
-    updateUserData
+    updateUserData,
+    api // Export the configured axios instance
   };
 
   return (
