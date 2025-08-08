@@ -14,7 +14,7 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
-# 37 hobbies - Phase 2
+# 54 hobbies - المجموعة الكاملة!
 hobbies = [
     {"id": 1, "name": "حفظ القرآن الكريم", "description": "ابدأ رحلة روحانية في حفظ القرآن الكريم والتواصل مع آياته وتعاليمه الجميلة", "category": "روحانية", "skill_level": "Beginner", "cost_level": "Low"},
     {"id": 2, "name": "فن الأوريغامي", "description": "فن ياباني لطي الورق، يهدف إلى صنع منحوتات جميلة من ورقة واحدة", "category": "فنون", "skill_level": "Beginner", "cost_level": "Low"},
@@ -36,8 +36,6 @@ hobbies = [
     {"id": 18, "name": "صناعة الشموع", "description": "اصنع شموعك العطرية الخاصة بروائح مختلفة", "category": "حرف", "skill_level": "Beginner", "cost_level": "Medium"},
     {"id": 19, "name": "التلوين الواعي", "description": "استخدم كتب تلوين الماندالا أو الرسومات الجمالية للاسترخاء", "category": "فنون", "skill_level": "Beginner", "cost_level": "Low"},
     {"id": 20, "name": "برطمان الامتنان", "description": "أضف ملاحظة يومية عن شيء تشعر بالامتنان له", "category": "تطوير شخصي", "skill_level": "Beginner", "cost_level": "Low"},
-    
-    # إضافة 17 هواية جديدة - المرحلة الثانية
     {"id": 21, "name": "مراقبة الطيور", "description": "تعلم التعرف على الطيور المحلية من نافذتك أو في الحديقة", "category": "طبيعة", "skill_level": "Beginner", "cost_level": "Low"},
     {"id": 22, "name": "السفر الافتراضي", "description": "استكشف دولاً عشوائية واصنع قوائم بالوجهات التي تحلم بها باستخدام Google Earth", "category": "سفر وثقافة", "skill_level": "Beginner", "cost_level": "Free"},
     {"id": 23, "name": "التدوين الرقمي", "description": "نظم أفكارك، تتبع أهدافك، وزين بالملصقات الرقمية باستخدام تطبيقات مثل Goodnotes/Notion", "category": "رقمي", "skill_level": "Beginner", "cost_level": "Low"},
@@ -54,20 +52,39 @@ hobbies = [
     {"id": 34, "name": "رسم خرائط الأحلام", "description": "ارسم خرائط لأماكن الأحلام أو العوالم الخيالية التي تتخيلها", "category": "فنون وخيال", "skill_level": "Beginner", "cost_level": "Low"},
     {"id": 35, "name": "قائمة الإنجازات العكسية", "description": "اكتب واحتفل بكل الأشياء الرائعة التي قمت بها بالفعل في حياتك", "category": "تطوير شخصي", "skill_level": "Beginner", "cost_level": "Free"},
     {"id": 36, "name": "صناعة الخطوط", "description": "حول خط يدك إلى خط رقمي يمكن استخدامه على الكمبيوتر", "category": "رقمي", "skill_level": "Beginner", "cost_level": "Free"},
-    {"id": 37, "name": "التمثيل الصوتي", "description": "تدرب على قراءة شخصيات من العروض/الكتب بأصوات مختلفة ومميزة", "category": "فنون أداء", "skill_level": "Beginner", "cost_level": "Low"}
+    {"id": 37, "name": "التمثيل الصوتي", "description": "تدرب على قراءة شخصيات من العروض/الكتب بأصوات مختلفة ومميزة", "category": "فنون أداء", "skill_level": "Beginner", "cost_level": "Low"},
+    
+    # الـ 17 هواية الأخيرة - إكمال الـ 54!
+    {"id": 38, "name": "التقطير المائي", "description": "اصنع عطوراً ومياه عطرة طبيعية من الزهور والأعشاب", "category": "علوم طبيعية", "skill_level": "Beginner", "cost_level": "Medium"},
+    {"id": 39, "name": "صناعة الكتب المصغرة", "description": "ابتكر كتباً صغيرة رائعة باليد للمجموعة أو كهدايا", "category": "حرف الورق", "skill_level": "Beginner", "cost_level": "Low"},
+    {"id": 40, "name": "فن الكولاج", "description": "اجمع مقاطع من المجلات والصور لإنشاء أعمال فنية فريدة", "category": "فنون", "skill_level": "Beginner", "cost_level": "Low"},
+    {"id": 41, "name": "تربية النباتات المائية", "description": "اعتن بنباتات تنمو في الماء فقط في أوعية زجاجية جميلة", "category": "طبيعة", "skill_level": "Beginner", "cost_level": "Low"},
+    {"id": 42, "name": "البرمجة الإبداعية", "description": "تعلم البرمجة لإنشاء فن رقمي وألعاب بسيطة", "category": "تكنولوجيا", "skill_level": "Beginner", "cost_level": "Free"},
+    {"id": 43, "name": "جمع وتصنيف الأحجار", "description": "ابحث عن أحجار مثيرة وتعلم عن أنواعها وخصائصها", "category": "علوم الأرض", "skill_level": "Beginner", "cost_level": "Low"},
+    {"id": 44, "name": "فن الخط العربي", "description": "تعلم جمال الخط العربي وابتكر قطعاً فنية بالكلمات", "category": "فنون تراثية", "skill_level": "Beginner", "cost_level": "Low"},
+    {"id": 45, "name": "العناية بالطيور", "description": "اجذب الطيور لحديقتك بالمياه والطعام وراقب سلوكها", "category": "حياة برية", "skill_level": "Beginner", "cost_level": "Low"},
+    {"id": 46, "name": "تصميم الألعاب البسيطة", "description": "ابتكر ألعاب ورقية أو رقمية بسيطة للأصدقاء والعائلة", "category": "تصميم ألعاب", "skill_level": "Beginner", "cost_level": "Free"},
+    {"id": 47, "name": "فن الأشكال الهندسية", "description": "ارسم أو اصنع أشكالاً هندسية جميلة ومعقدة", "category": "رياضيات فنية", "skill_level": "Beginner", "cost_level": "Low"},
+    {"id": 48, "name": "صنع العرائس الورقية", "description": "اصنع عرائس ورقية بسيطة لسرد القصص والمرح", "category": "حرف ترفيهية", "skill_level": "Beginner", "cost_level": "Low"},
+    {"id": 49, "name": "علم الفلك المبسط", "description": "راقب النجوم والقمر وتعلم عن الكواكب والأجرام السماوية", "category": "علوم الفضاء", "skill_level": "Beginner", "cost_level": "Free"},
+    {"id": 50, "name": "التأمل والاسترخاء", "description": "تعلم تقنيات التأمل والتنفس للاسترخاء وتحسين التركيز", "category": "صحة نفسية", "skill_level": "Beginner", "cost_level": "Free"},
+    {"id": 51, "name": "مهارات البقاء البسيطة", "description": "تعلم مهارات أساسية للبقاء والطوارئ في الطبيعة", "category": "مهارات حياتية", "skill_level": "Beginner", "cost_level": "Low"},
+    {"id": 52, "name": "فن المجوهرات البسيطة", "description": "اصنع إكسسوارات جميلة باستخدام الخرز والخيوط", "category": "حرف الزينة", "skill_level": "Beginner", "cost_level": "Medium"},
+    {"id": 53, "name": "المحافظة على البيئة", "description": "تعلم وطبق طرق صديقة للبيئة في حياتك اليومية", "category": "بيئة واستدامة", "skill_level": "Beginner", "cost_level": "Free"},
+    {"id": 54, "name": "فن السيراميك المنزلي", "description": "شكّل واصنع قطعاً فنية من الطين بدون أفران خاصة", "category": "فنون تشكيلية", "skill_level": "Beginner", "cost_level": "Medium"}
 ]
 
 @app.get("/")
 def root():
-    return {"message": f"AI Hobby Recommender with {len(hobbies)} hobbies!", "phase": "2 of 3"}
+    return {"message": f"🎉 AI Hobby Recommender - Complete with ALL {len(hobbies)} hobbies! 🎉", "status": "COMPLETE", "celebration": "🌟✨🎊"}
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "hobbies_count": len(hobbies)}
+    return {"status": "perfect", "hobbies_count": len(hobbies), "complete": True}
 
 @app.get("/api/health")
 def api_health():
-    return {"status": "working", "hobbies": len(hobbies), "phase": "2 of 3", "message": "Growing steadily!"}
+    return {"status": "🔥 COMPLETE!", "hobbies": len(hobbies), "message": "All 54 hobbies are here! Perfect collection! 🌟"}
 
 @app.post("/api/auth/register")
 def register(user: UserCreate):
@@ -87,12 +104,12 @@ def get_profile():
 
 @app.get("/api/hobbies")
 def get_hobbies():
-    return {"hobbies": hobbies, "total": len(hobbies), "message": f"متاح الآن {len(hobbies)} هواية رائعة!"}
+    return {"hobbies": hobbies, "total": len(hobbies), "message": f"🎉 المجموعة الكاملة! {len(hobbies)} هواية رائعة!", "celebration": "🌟✨"}
 
 @app.get("/api/hobbies/daily")
 def daily_hobby():
     hobby = random.choice(hobbies)
-    return {"hobby": hobby, "message": f"هواية اليوم من بين {len(hobbies)} هواية متنوعة!"}
+    return {"hobby": hobby, "message": f"هواية اليوم من بين المجموعة الكاملة من {len(hobbies)} هواية! 🌟", "total_available": len(hobbies)}
 
 @app.get("/api/hobbies/{hobby_id}")
 def get_hobby(hobby_id: int):
@@ -103,14 +120,20 @@ def get_hobby(hobby_id: int):
 
 @app.post("/api/hobbies/recommend")
 def recommend():
-    num_recommendations = min(5, len(hobbies))
+    num_recommendations = min(8, len(hobbies))  # زيادة الاقتراحات لـ 8
     recommendations = random.sample(hobbies, num_recommendations)
-    return {"recommendations": recommendations, "total_available": len(hobbies), "message": f"إليك {num_recommendations} اقتراحات من بين {len(hobbies)} هواية!"}
+    return {"recommendations": recommendations, "total_available": len(hobbies), "message": f"إليك {num_recommendations} اقتراحات من المجموعة الكاملة من {len(hobbies)} هواية! 🌟"}
 
 @app.get("/api/hobbies/category/{category}")
 def get_hobbies_by_category(category: str):
     filtered = [h for h in hobbies if category.lower() in h["category"].lower()]
-    return {"hobbies": filtered, "category": category, "total": len(filtered)}
+    return {"hobbies": filtered, "category": category, "total": len(filtered), "total_available": len(hobbies)}
+
+@app.get("/api/hobbies/random/{count}")
+def get_random_hobbies(count: int = 5):
+    count = min(count, len(hobbies))
+    random_hobbies = random.sample(hobbies, count)
+    return {"hobbies": random_hobbies, "count": count, "total_available": len(hobbies)}
 
 app.add_middleware(
     CORSMiddleware,
