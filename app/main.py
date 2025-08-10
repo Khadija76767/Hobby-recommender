@@ -1,14 +1,56 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import random
 import os
+import logging
+
+# تجربة استيراد قاعدة البيانات
+try:
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.orm import sessionmaker, Session
+    from app.api.routes import api_router
+    DATABASE_AVAILABLE = True
+    print("✅ تم تحميل قاعدة البيانات بنجاح!")
+except ImportError as e:
+    DATABASE_AVAILABLE = False
+    print(f"⚠️ قاعدة البيانات غير متاحة: {e}")
 
 app = FastAPI(
     title="AI Hobby Recommender",
     description="نظام ذكي لاقتراح الهوايات باستخدام الذكاء الاصطناعي",
-    version="1.0.0"
+    version="2.0.0"
 )
+
+# إعداد قاعدة البيانات إذا كانت متاحة
+if DATABASE_AVAILABLE and os.getenv("DATABASE_URL"):
+    try:
+        DATABASE_URL = os.getenv("DATABASE_URL")
+        engine = create_engine(DATABASE_URL)
+        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        
+        # تضمين routes API الحقيقية
+        app.include_router(api_router, prefix="/api")
+        print("🔥 تم تفعيل النظام المتقدم مع قاعدة البيانات!")
+        SYSTEM_MODE = "ADVANCED"
+    except Exception as e:
+        print(f"❌ فشل في إعداد قاعدة البيانات: {e}")
+        DATABASE_AVAILABLE = False
+        SYSTEM_MODE = "SIMPLE"
+else:
+    SYSTEM_MODE = "SIMPLE"
+    print("🔄 تشغيل النظام البسيط")
+
+# دالة للحصول على جلسة قاعدة البيانات
+def get_db():
+    if DATABASE_AVAILABLE:
+        db = SessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
+    else:
+        yield None
 
 class UserCreate(BaseModel):
     username: str
@@ -79,41 +121,86 @@ hobbies = [
 
 @app.get("/")
 def root():
-    return {"message": f"🎉 AI Hobby Recommender - STABLE with {len(hobbies)} hobbies! 🎉", "status": "STABLE", "users": "Simple & reliable! ⚡"}
+    return {
+        "message": f"🚀 AI Hobby Recommender v2.0 - {SYSTEM_MODE} Mode!", 
+        "hobbies": len(hobbies),
+        "system": SYSTEM_MODE,
+        "database": "Connected" if DATABASE_AVAILABLE else "Simple Mode",
+        "features": ["Multi-user", "Real Auth", "Profiles", "Friend Codes"] if SYSTEM_MODE == "ADVANCED" else ["Single Session", "Demo Mode"]
+    }
 
 @app.get("/health")
 def health():
-    return {"status": "excellent", "hobbies_count": len(hobbies), "stable": True}
+    return {
+        "status": "excellent", 
+        "hobbies_count": len(hobbies), 
+        "system_mode": SYSTEM_MODE,
+        "database_connected": DATABASE_AVAILABLE
+    }
 
 @app.get("/api/health")
 def api_health():
-    return {"status": "🔥 STABLE!", "hobbies": len(hobbies), "message": "Ultra-stable with 54 hobbies! 🌟"}
+    return {
+        "status": f"🔥 {SYSTEM_MODE} MODE!", 
+        "hobbies": len(hobbies), 
+        "message": f"Running in {SYSTEM_MODE} mode with 54 hobbies! 🌟",
+        "database": "PostgreSQL" if DATABASE_AVAILABLE else "In-Memory"
+    }
 
-# Simple auth endpoints that work
+# Simple auth endpoints (fallback)
 @app.post("/api/auth/register")
-def register(user: UserCreate):
-    return {"message": "تم التسجيل بنجاح", "user": {"username": user.username, "email": user.email, "id": 1}}
+def register_simple(user: UserCreate):
+    if SYSTEM_MODE == "ADVANCED":
+        return {"message": "سيتم التعامل مع التسجيل بواسطة النظام المتقدم", "redirect": "use_advanced_system"}
+    
+    return {
+        "message": "تم التسجيل بنجاح (النظام البسيط)", 
+        "user": {"username": user.username, "email": user.email, "id": 1},
+        "note": "هذا النظام البسيط - للنظام المتقدم نحتاج إعداد قاعدة البيانات"
+    }
 
 @app.post("/api/auth/login")
-def login(user: UserLogin):
-    return {"message": "تم تسجيل الدخول", "access_token": "test_token", "user": {"email": user.email, "username": "User", "id": 1}}
+def login_simple(user: UserLogin):
+    if SYSTEM_MODE == "ADVANCED":
+        return {"message": "سيتم التعامل مع تسجيل الدخول بواسطة النظام المتقدم", "redirect": "use_advanced_system"}
+    
+    return {
+        "message": "تم تسجيل الدخول (النظام البسيط)", 
+        "access_token": "simple_token", 
+        "user": {"email": user.email, "username": "مستخدم", "id": 1}
+    }
 
 @app.get("/api/auth/me")
-def get_me():
-    return {"id": 1, "username": "مستخدم", "email": "user@example.com"}
+def get_me_simple():
+    return {"id": 1, "username": "مستخدم", "email": "user@example.com", "system": SYSTEM_MODE}
 
 @app.get("/api/auth/profile")
-def get_profile():
-    return {"id": 1, "username": "مستخدم", "display_name": "مستخدم", "user_code": "ABC123"}
+def get_profile_simple():
+    return {
+        "id": 1, 
+        "username": "مستخدم", 
+        "display_name": "مستخدم", 
+        "user_code": "DEMO123",
+        "system": SYSTEM_MODE
+    }
 
 @app.get("/api/hobbies")
 def get_hobbies():
-    return {"hobbies": hobbies, "total": len(hobbies), "message": f"🎉 المجموعة الكاملة! {len(hobbies)} هواية رائعة!", "celebration": "🌟✨"}
+    return {
+        "hobbies": hobbies, 
+        "total": len(hobbies), 
+        "message": f"🎉 المجموعة الكاملة! {len(hobbies)} هواية رائعة!",
+        "system": SYSTEM_MODE
+    }
 
 @app.get("/api/hobbies/daily")
 def daily_hobby():
     hobby = random.choice(hobbies)
-    return {"hobby": hobby, "message": f"هواية اليوم من بين المجموعة الكاملة من {len(hobbies)} هواية! 🌟", "total_available": len(hobbies)}
+    return {
+        "hobby": hobby, 
+        "message": f"هواية اليوم من بين {len(hobbies)} هواية! 🌟", 
+        "system": SYSTEM_MODE
+    }
 
 @app.get("/api/hobbies/{hobby_id}")
 def get_hobby(hobby_id: int):
@@ -126,18 +213,50 @@ def get_hobby(hobby_id: int):
 def recommend():
     num_recommendations = min(8, len(hobbies))
     recommendations = random.sample(hobbies, num_recommendations)
-    return {"recommendations": recommendations, "total_available": len(hobbies), "message": f"إليك {num_recommendations} اقتراحات من المجموعة الكاملة من {len(hobbies)} هواية! 🌟"}
+    return {
+        "recommendations": recommendations, 
+        "total_available": len(hobbies), 
+        "message": f"إليك {num_recommendations} اقتراحات! 🌟",
+        "system": SYSTEM_MODE
+    }
 
 @app.get("/api/hobbies/category/{category}")
 def get_hobbies_by_category(category: str):
     filtered = [h for h in hobbies if category.lower() in h["category"].lower()]
-    return {"hobbies": filtered, "category": category, "total": len(filtered), "total_available": len(hobbies)}
+    return {
+        "hobbies": filtered, 
+        "category": category, 
+        "total": len(filtered),
+        "system": SYSTEM_MODE
+    }
 
 @app.get("/api/hobbies/random/{count}")
 def get_random_hobbies(count: int = 5):
     count = min(count, len(hobbies))
     random_hobbies = random.sample(hobbies, count)
-    return {"hobbies": random_hobbies, "count": count, "total_available": len(hobbies)}
+    return {
+        "hobbies": random_hobbies, 
+        "count": count, 
+        "total_available": len(hobbies),
+        "system": SYSTEM_MODE
+    }
+
+# اختبار الاتصال بقاعدة البيانات
+@app.get("/api/database/test")
+def test_database(db: Session = Depends(get_db)):
+    if not DATABASE_AVAILABLE or not db:
+        return {"status": "simple_mode", "message": "قاعدة البيانات غير متاحة - النظام البسيط نشط"}
+    
+    try:
+        # اختبار بسيط للاتصال
+        result = db.execute(text("SELECT 1 as test"))
+        return {
+            "status": "connected", 
+            "message": "🔥 قاعدة البيانات متصلة ونشطة!",
+            "system": "ADVANCED"
+        }
+    except Exception as e:
+        return {"status": "error", "message": f"خطأ في قاعدة البيانات: {str(e)}"}
 
 app.add_middleware(
     CORSMiddleware,
