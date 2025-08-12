@@ -117,8 +117,8 @@ const HobbySuggestion = ({ mood }) => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                 <Typography variant="h5" component="h3" fontFamily="Patrick Hand">
-                  {currentHobby.name}
-                </Typography>
+                {currentHobby.name}
+              </Typography>
                 <IconButton
                   onClick={handleOpenModal}
                   sx={{ 
@@ -144,14 +144,14 @@ const HobbySuggestion = ({ mood }) => {
                   }}
                 />
                 {currentHobby.skill_level && (
-                  <Chip
-                    label={`${currentHobby.skill_level} Level`}
-                    size="small"
-                    sx={{
-                      bgcolor: 'rgba(255, 181, 232, 0.1)',
-                      border: '1px solid rgba(255, 181, 232, 0.3)',
-                    }}
-                  />
+                <Chip
+                  label={`${currentHobby.skill_level} Level`}
+                  size="small"
+                  sx={{
+                    bgcolor: 'rgba(255, 181, 232, 0.1)',
+                    border: '1px solid rgba(255, 181, 232, 0.3)',
+                  }}
+                />
                 )}
               </Box>
             </CardContent>
