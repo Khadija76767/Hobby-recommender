@@ -417,15 +417,17 @@ def get_random_hobbies(count: int = 5):
         "total_available": len(hobbies)
     }
 
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "*",
         "https://hobby-recommender.vercel.app",
-        "https://hobby-recommender-khadija76767.vercel.app",
-        "https://khadija-hobby-recommender.vercel.app"
+        "https://hobby-recommender-khadija76767.vercel.app", 
+        "https://khadija-hobby-recommender.vercel.app",
+        "http://localhost:3000",
+        "http://localhost:8000"
     ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )

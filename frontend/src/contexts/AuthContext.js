@@ -111,38 +111,46 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const register = async (userData) => {
+  const register = async (username, email, password) => {
     try {
       console.log('📝 Attempting registration with REAL database...');
       
       // Try real database registration first
       try {
-        const response = await api.post('/api/auth/register', userData);
+        const response = await api.post('/api/auth/register', {
+          username: username,
+          email: email,
+          password: password
+        });
+        
+        const { access_token, user } = response.data;
+        localStorage.setItem('token', access_token);
+        setToken(access_token);
+        setCurrentUser(user);
         console.log('✅ Real database registration successful!');
-        return { success: true, user: response.data };
+        return { success: true };
       } catch (realError) {
         console.log('⚠️ Real database registration failed, trying backup...');
         
-        // Fallback to backup endpoint
-        const response = await api.post('/api/auth/register-backup', userData);
+        // Fallback for registration
+        const response = await api.post('/api/auth/register-backup', {
+          username: username,
+          email: email,
+          password: password
+        });
+        
+        const { access_token, user } = response.data;
+        localStorage.setItem('token', access_token);
+        setToken(access_token);
+        setCurrentUser(user);
         console.log('✅ Backup registration successful!');
-        return { success: true, user: response.data };
+        return { success: true };
       }
     } catch (error) {
-      console.error('❌ All registration methods failed:', error);
+      console.error('❌ Registration failed:', error);
       if (error.response) {
-        if (error.response.data && error.response.data.detail) {
-          if (typeof error.response.data.detail === 'string') {
-            return { success: false, error: error.response.data.detail };
-          }
-          if (Array.isArray(error.response.data.detail)) {
-            const errorMessage = error.response.data.detail
-              .map(err => err.msg)
-              .join('. ');
-            return { success: false, error: errorMessage };
-          }
-        }
-        return { success: false, error: 'Registration failed: ' + (error.response.data?.detail || error.response.statusText) };
+        const errorMessage = error.response.data?.detail || 'Registration failed';
+        return { success: false, error: errorMessage };
       } else if (error.request) {
         return { success: false, error: 'No response from server. Please try again.' };
       } else {
@@ -155,7 +163,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
     setToken(null);
     setCurrentUser(null);
-    console.log('👋 User logged out');
+    console.log('�� User logged out');
   };
 
   const value = {
