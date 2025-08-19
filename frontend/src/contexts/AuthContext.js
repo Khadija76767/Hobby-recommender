@@ -23,13 +23,18 @@ export function AuthProvider({ children }) {
     console.log("🔥 Using REAL database system!");
     
     // If we have a token, set up axios headers and fetch user data
-    if (token) {
+    if (token && !currentUser) {
+      console.log('🔑 Token found, setting up authentication...');
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       fetchUserData();
-    } else {
+    } else if (!token) {
+      console.log('❌ No token found');
+      setLoading(false);
+    } else if (currentUser) {
+      console.log('✅ User already loaded, skipping fetch');
       setLoading(false);
     }
-  }, [token]);
+  }, [token, currentUser]);
 
   const fetchUserData = async () => {
     try {

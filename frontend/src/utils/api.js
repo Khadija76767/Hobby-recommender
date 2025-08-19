@@ -26,10 +26,14 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // تعطيل الخروج التلقائي - دع AuthContext يتعامل مع الأخطاء
+    console.log('⚠️ API Error intercepted but not auto-logging out:', error.response?.status);
+    
+    // فقط log الخطأ بدون إجراءات
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      console.log('🔒 401 Unauthorized detected, but staying logged in');
     }
+    
     return Promise.reject(error);
   }
 );
