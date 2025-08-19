@@ -324,6 +324,40 @@ def login_json(user: UserLogin, db: Session = Depends(get_db)):
         }
     }
 
+@app.post("/api/auth/token")
+def login_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Fallback token endpoint for compatibility"""
+    if not DATABASE_AVAILABLE or not db or not User:
+        return {
+            "access_token": "demo_token",
+            "token_type": "bearer",
+            "user": {"username": form_data.username, "id": 1, "user_code": generate_user_code()}
+        }
+    
+    db_user = db.query(User).filter(User.username == form_data.username).first()
+    if not db_user or not verify_password(form_data.password, db_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="اسم المستخدم أو كلمة المرور غير صحيحة",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": db_user.username}, expires_delta=access_token_expires
+    )
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": db_user.id,
+            "username": db_user.username,
+            "email": db_user.email,
+            "user_code": db_user.user_code
+        }
+    }
+
 @app.get("/api/auth/me")
 def get_me(current_user = Depends(get_current_user)):
     return current_user

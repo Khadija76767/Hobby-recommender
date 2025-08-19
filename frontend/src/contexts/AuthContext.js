@@ -67,7 +67,7 @@ export function AuthProvider({ children }) {
       // Try the real database login first
       try {
         const response = await api.post('/api/auth/login', {
-          email: email,
+          username: email,  // استخدام username للتوافق مع Backend
           password: password
         });
         
