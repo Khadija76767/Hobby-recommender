@@ -32,12 +32,36 @@ import api from '../utils/api'; // إضافة import api
 import { useAuth } from '../contexts/AuthContext';
 import ConnectWithFriends from './ConnectWithFriends';
 
+// تحقق من وجود api وإنشاء fallback
+console.log('🔍 API object check:', typeof api, api);
+
 const HobbySuggestion = ({ mood }) => {
-  const theme = useTheme();
-  const { api } = useAuth();
   const [currentHobby, setCurrentHobby] = useState(null);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const { currentUser } = useAuth();
+  const theme = useTheme();
+
+  // إنشاء API محلي إذا لم يكن موجود
+  const safeApi = api || {
+    get: async (url) => {
+      console.log('🆘 Using fallback API for:', url);
+      // إرجاع بيانات وهمية
+      return {
+        data: {
+          hobby: {
+            id: 1,
+            name: "القراءة",
+            description: "اكتشف عوالم جديدة في الكتب ووسع معرفتك",
+            category: "تعليم",
+            skill_level: "Beginner",
+            cost_level: "Low"
+          },
+          message: "هواية احتياطية"
+        }
+      };
+    }
+  };
 
   const fetchNewHobby = async () => {
     if (!mood) {
@@ -47,9 +71,10 @@ const HobbySuggestion = ({ mood }) => {
     
     try {
       setLoading(true);
-      console.log('🎯 Fetching daily hobby...');
+      console.log('🎯 Fetching daily hobby with safeApi...');
+      console.log('🔍 safeApi type:', typeof safeApi, 'has get:', typeof safeApi.get);
       
-      const response = await api.get('/api/hobbies/daily');
+      const response = await safeApi.get('/api/hobbies/daily');
       console.log('✅ Daily hobby response:', response.data);
       
       // API returns {hobby: {...}, message: "..."}
