@@ -14,9 +14,21 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  CircularProgress,
+  Snackbar,
+  Alert
 } from '@mui/material';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import InfoIcon from '@mui/icons-material/Info';
+import {
+  Refresh as RefreshIcon,
+  Lightbulb as LightbulbIcon,
+  AutoAwesome as AutoAwesomeIcon,
+  Star as StarIcon,
+  AccessTime as AccessTimeIcon,
+  TrendingUp as TrendingUpIcon,
+  Close as CloseIcon,
+  Psychology as PsychologyIcon
+} from '@mui/icons-material';
+import api from '../utils/api'; // إضافة import api
 import { useAuth } from '../contexts/AuthContext';
 import ConnectWithFriends from './ConnectWithFriends';
 
@@ -35,19 +47,43 @@ const HobbySuggestion = ({ mood }) => {
     
     try {
       setLoading(true);
+      console.log('🎯 Fetching daily hobby...');
+      
       const response = await api.get('/api/hobbies/daily');
-      console.log('Daily hobby response:', response.data); // Debug log
+      console.log('✅ Daily hobby response:', response.data);
       
       // API returns {hobby: {...}, message: "..."}
       if (response.data && response.data.hobby) {
         setCurrentHobby(response.data.hobby);
+        console.log('🎉 Hobby loaded:', response.data.hobby.name);
       } else {
-        console.error('No hobby data received:', response.data);
+        console.error('❌ No hobby data received:', response.data);
+        // إنشاء هواية احتياطية
+        setCurrentHobby({
+          id: 1,
+          name: "القراءة",
+          description: "اكتشف عوالم جديدة في الكتب ووسع معرفتك",
+          category: "تعليم",
+          skill_level: "Beginner",
+          cost_level: "Low"
+        });
       }
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching hobby:', error);
+      console.error('❌ Error fetching hobby:', error);
+      
+      // هواية احتياطية في حالة الخطأ
+      setCurrentHobby({
+        id: 1,
+        name: "التأمل والاسترخاء",
+        description: "تعلم تقنيات التأمل والتنفس للاسترخاء وتحسين التركيز",
+        category: "صحة نفسية",
+        skill_level: "Beginner",
+        cost_level: "Free"
+      });
+      
       setLoading(false);
+      console.log('🆘 Using fallback hobby due to error');
     }
   };
 
