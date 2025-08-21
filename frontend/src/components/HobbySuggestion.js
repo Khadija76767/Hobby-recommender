@@ -71,35 +71,92 @@ const HobbySuggestion = ({ mood }) => {
     
     try {
       setLoading(true);
-      console.log('🎯 Fetching daily hobby with safeApi...');
-      console.log('🔍 safeApi type:', typeof safeApi, 'has get:', typeof safeApi.get);
+      console.log('🎯 Loading hobby without API dependency...');
       
-      const response = await safeApi.get('/api/hobbies/daily');
-      console.log('✅ Daily hobby response:', response.data);
-      
-      // API returns {hobby: {...}, message: "..."}
-      if (response.data && response.data.hobby) {
-        setCurrentHobby(response.data.hobby);
-        console.log('🎉 Hobby loaded:', response.data.hobby.name);
-      } else {
-        console.error('❌ No hobby data received:', response.data);
-        // إنشاء هواية احتياطية
-        setCurrentHobby({
+      // قائمة هوايات محلية - لا تعتمد على API
+      const localHobbies = [
+        {
           id: 1,
+          name: "حفظ القرآن الكريم",
+          description: "ابدأ رحلة روحانية في حفظ القرآن الكريم والتواصل مع آياته وتعاليمه الجميلة",
+          category: "روحانية",
+          skill_level: "Beginner",
+          cost_level: "Low"
+        },
+        {
+          id: 2,
           name: "القراءة",
           description: "اكتشف عوالم جديدة في الكتب ووسع معرفتك",
           category: "تعليم",
           skill_level: "Beginner",
           cost_level: "Low"
-        });
-      }
-      setLoading(false);
-    } catch (error) {
-      console.error('❌ Error fetching hobby:', error);
+        },
+        {
+          id: 3,
+          name: "الرسم",
+          description: "ارسم بالألوان والأقلام وعبر عن إبداعك",
+          category: "فنون",
+          skill_level: "Beginner",
+          cost_level: "Low"
+        },
+        {
+          id: 4,
+          name: "البستنة",
+          description: "ازرع واعتني بالنباتات، وأنشئ مساحتك الخضراء الخاصة",
+          category: "طبيعة",
+          skill_level: "Beginner",
+          cost_level: "Medium"
+        },
+        {
+          id: 5,
+          name: "التأمل والاسترخاء",
+          description: "تعلم تقنيات التأمل والتنفس للاسترخاء وتحسين التركيز",
+          category: "صحة نفسية",
+          skill_level: "Beginner",
+          cost_level: "Free"
+        },
+        {
+          id: 6,
+          name: "كتابة اليوميات",
+          description: "دوّن أفكارك ومشاعرك وتجاربك في مذكرة شخصية",
+          category: "كتابة",
+          skill_level: "Beginner",
+          cost_level: "Low"
+        },
+        {
+          id: 7,
+          name: "التصوير",
+          description: "التقط وابتكر صوراً جميلة باستخدام الكاميرا",
+          category: "فنون",
+          skill_level: "Beginner",
+          cost_level: "Medium"
+        },
+        {
+          id: 8,
+          name: "الطبخ",
+          description: "تعلم وصفات جديدة ولذيذة وابتكر أطباقك الخاصة",
+          category: "طعام",
+          skill_level: "Beginner",
+          cost_level: "Medium"
+        }
+      ];
       
-      // هواية احتياطية في حالة الخطأ
+      // اختيار هواية عشوائية
+      const randomHobby = localHobbies[Math.floor(Math.random() * localHobbies.length)];
+      
+      // محاكاة loading time
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setCurrentHobby(randomHobby);
+      console.log('✅ Local hobby loaded:', randomHobby.name);
+      setLoading(false);
+      
+    } catch (error) {
+      console.error('❌ Error in hobby loading:', error);
+      
+      // هواية احتياطية مضمونة
       setCurrentHobby({
-        id: 1,
+        id: 999,
         name: "التأمل والاسترخاء",
         description: "تعلم تقنيات التأمل والتنفس للاسترخاء وتحسين التركيز",
         category: "صحة نفسية",
@@ -108,7 +165,7 @@ const HobbySuggestion = ({ mood }) => {
       });
       
       setLoading(false);
-      console.log('🆘 Using fallback hobby due to error');
+      console.log('🆘 Emergency hobby loaded');
     }
   };
 
