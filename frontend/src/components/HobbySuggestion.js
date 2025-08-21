@@ -26,7 +26,8 @@ import {
   AccessTime as AccessTimeIcon,
   TrendingUp as TrendingUpIcon,
   Close as CloseIcon,
-  Psychology as PsychologyIcon
+  Psychology as PsychologyIcon,
+  Info as InfoIcon // إضافة InfoIcon
 } from '@mui/icons-material';
 import api from '../utils/api'; // إضافة import api
 import { useAuth } from '../contexts/AuthContext';
