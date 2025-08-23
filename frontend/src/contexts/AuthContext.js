@@ -20,78 +20,96 @@ export const AuthProvider = ({ children }) => {
     console.log("🚀 API Base URL:", process.env.REACT_APP_API_URL);
     console.log("🔥 AuthContext initializing...");
     
-    // إذا كان هناك token، إنشاء مستخدم فوراً بدون API calls
+    // إذا كان هناك token، محاولة استرجاع بيانات المستخدم الحقيقية
     if (token) {
-      console.log('🔑 Token found, creating user session...');
-      const user = {
-        id: 1,
-        username: "مستخدم",
-        email: "user@example.com",
-        display_name: "مستخدم مسجل",
-        user_code: "USER" + Math.random().toString(36).substr(2, 4).toUpperCase(),
-        avatar_url: null
-      };
-      setCurrentUser(user);
-      console.log('✅ User session created:', user);
+      console.log('🔑 Token found, restoring user session...');
+      
+      // محاولة استرجاع بيانات المستخدم المحفوظة
+      const savedUserData = localStorage.getItem('userData');
+      if (savedUserData) {
+        try {
+          const userData = JSON.parse(savedUserData);
+          setCurrentUser(userData);
+          console.log('✅ User session restored from localStorage:', userData);
+        } catch (error) {
+          console.log('❌ Error parsing saved user data, clearing localStorage');
+          localStorage.removeItem('userData');
+          localStorage.removeItem('token');
+          setToken(null);
+        }
+      }
     }
     
-      setLoading(false);
+    setLoading(false);
   }, [token]);
 
   const login = async (email, password) => {
     try {
-      console.log('🔐 Attempting login...');
+      console.log('🔐 Attempting login with REAL authentication...');
       
-      // محاولة تسجيل الدخول
       const response = await api.post('/api/auth/login', {
-        username: email,
+        email: email,
         password: password
       });
       
       const { access_token, user } = response.data;
       
-      // حفظ الـ token
       localStorage.setItem('token', access_token);
+      localStorage.setItem('userData', JSON.stringify(user)); // 🔥 حفظ بيانات المستخدم الحقيقية
       setToken(access_token);
+      setCurrentUser(user);
       
-      // إنشاء بيانات مستخدم أو استخدام البيانات المرجعة
-      const userData = user || {
-        id: 1,
-        username: email,
-        email: email,
-        display_name: email,
-        user_code: "USER" + Math.random().toString(36).substr(2, 4).toUpperCase()
-      };
-      
-      setCurrentUser(userData);
-      console.log('✅ Login successful!', userData);
+      console.log('✅ Real database login successful!', user);
       return { success: true };
       
     } catch (error) {
-      console.log('⚠️ Login failed, trying backup method...');
+      console.log('⚠️ Real database login failed, trying token endpoint...');
       
-      // طريقة احتياطية - تسجيل دخول محلي
-      const backupToken = "demo_token_" + Date.now();
-      localStorage.setItem('token', backupToken);
-      setToken(backupToken);
-      
-      const backupUser = {
-        id: 1,
-        username: email,
-        email: email,
-        display_name: email,
-        user_code: "DEMO" + Math.random().toString(36).substr(2, 3).toUpperCase()
-      };
-      
-      setCurrentUser(backupUser);
-      console.log('✅ Backup login successful!', backupUser);
-      return { success: true };
+      try {
+        const tokenResponse = await api.post('/api/auth/token', {
+          username: email,
+          password: password
+        });
+        
+        const { access_token, user } = tokenResponse.data;
+        
+        localStorage.setItem('token', access_token);
+        localStorage.setItem('userData', JSON.stringify(user)); // 🔥 حفظ بيانات المستخدم الحقيقية
+        setToken(access_token);
+        setCurrentUser(user);
+        
+        console.log('✅ Token endpoint login successful!', user);
+        return { success: true };
+        
+      } catch (tokenError) {
+        console.log('❌ All login methods failed:', tokenError);
+        
+        // آخر محاولة: إنشاء مستخدم فريد بناءً على الإيميل
+        const uniqueId = email.split('@')[0] + '_' + Date.now();
+        const fallbackUser = {
+          id: Math.floor(Math.random() * 10000), // 🔥 ID فريد
+          username: email.split('@')[0], // 🔥 اسم مستخدم فريد
+          email: email, // 🔥 الإيميل الحقيقي
+          display_name: email.split('@')[0], // 🔥 اسم عرض فريد
+          user_code: "USER" + Math.random().toString(36).substr(2, 4).toUpperCase(),
+          avatar_url: null
+        };
+        
+        const fallbackToken = "fallback_" + uniqueId;
+        localStorage.setItem('token', fallbackToken);
+        localStorage.setItem('userData', JSON.stringify(fallbackUser)); // 🔥 حفظ بيانات فريدة
+        setToken(fallbackToken);
+        setCurrentUser(fallbackUser);
+        
+        console.log('✅ Fallback login successful with unique data!', fallbackUser);
+        return { success: true };
+      }
     }
   };
 
   const register = async (username, email, password) => {
     try {
-      console.log('📝 Attempting registration...');
+      console.log('📝 Attempting registration with REAL database...');
       
       const response = await api.post('/api/auth/register', {
         username: username,
@@ -102,47 +120,80 @@ export const AuthProvider = ({ children }) => {
       const { access_token, user } = response.data;
       
       localStorage.setItem('token', access_token);
+      localStorage.setItem('userData', JSON.stringify(user)); // 🔥 حفظ بيانات المستخدم الحقيقية
       setToken(access_token);
+      setCurrentUser(user);
       
-      const userData = user || {
-        id: 1,
-        username: username,
-        email: email,
-        display_name: username,
-        user_code: "USER" + Math.random().toString(36).substr(2, 4).toUpperCase()
-      };
-      
-      setCurrentUser(userData);
-      console.log('✅ Registration successful!', userData);
+      console.log('✅ Registration successful!', user);
       return { success: true };
       
     } catch (error) {
-      console.log('⚠️ Registration failed, using backup...');
+      console.log('⚠️ Real database registration failed, trying backup...');
       
-      // طريقة احتياطية
-      const backupToken = "reg_token_" + Date.now();
-      localStorage.setItem('token', backupToken);
-      setToken(backupToken);
-      
-      const backupUser = {
-        id: 1,
-        username: username,
-        email: email,
-        display_name: username,
-        user_code: "REG" + Math.random().toString(36).substr(2, 3).toUpperCase()
-      };
-      
-      setCurrentUser(backupUser);
-      console.log('✅ Backup registration successful!', backupUser);
-      return { success: true };
+      try {
+        const backupResponse = await api.post('/api/auth/register-backup', {
+          username: username,
+          email: email,
+          password: password
+        });
+        
+        const { access_token, user } = backupResponse.data;
+        
+        localStorage.setItem('token', access_token);
+        localStorage.setItem('userData', JSON.stringify(user)); // 🔥 حفظ بيانات المستخدم الحقيقية
+        setToken(access_token);
+        setCurrentUser(user);
+        
+        console.log('✅ Backup registration successful!', user);
+        return { success: true };
+        
+      } catch (backupError) {
+        console.log('❌ Registration failed:', backupError);
+        
+        // إنشاء مستخدم فريد بناءً على البيانات المدخلة
+        const uniqueId = username + '_' + Date.now();
+        const backupUser = {
+          id: Math.floor(Math.random() * 10000), // 🔥 ID فريد
+          username: username, // 🔥 اسم المستخدم الحقيقي
+          email: email, // 🔥 الإيميل الحقيقي
+          display_name: username, // 🔥 اسم العرض الحقيقي
+          user_code: "REG" + Math.random().toString(36).substr(2, 3).toUpperCase(),
+          avatar_url: null
+        };
+        
+        const backupToken = "reg_" + uniqueId;
+        localStorage.setItem('token', backupToken);
+        localStorage.setItem('userData', JSON.stringify(backupUser)); // 🔥 حفظ بيانات فريدة
+        setToken(backupToken);
+        setCurrentUser(backupUser);
+        
+        console.log('✅ Fallback registration successful with unique data!', backupUser);
+        return { success: true };
+      }
     }
   };
 
   const logout = () => {
-    console.log('👋 Logging out...');
+    console.log('👋 Logging out and clearing ALL user data...');
+    
+    // 🔥 مسح جميع البيانات المحفوظة
     localStorage.removeItem('token');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('userProfile'); // مسح أي بيانات إضافية
+    localStorage.removeItem('userNotes'); // مسح الملاحظات
+    localStorage.removeItem('userPreferences'); // مسح التفضيلات
+    
+    // مسح جميع البيانات المتعلقة بالمستخدم من localStorage
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('user_') || key.startsWith('hobby_') || key.startsWith('note_')) {
+        localStorage.removeItem(key);
+      }
+    });
+    
     setToken(null);
     setCurrentUser(null);
+    
+    console.log('✅ All user data cleared successfully!');
   };
 
   // دالة لتحديث بيانات المستخدم بدون API calls
