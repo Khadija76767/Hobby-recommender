@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
       console.log('✅ User session created:', user);
     }
     
-    setLoading(false);
+      setLoading(false);
   }, [token]);
 
   const login = async (email, password) => {
