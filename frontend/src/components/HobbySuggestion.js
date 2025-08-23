@@ -9,10 +9,9 @@ import {
   IconButton,
   Collapse,
   CircularProgress,
-  Alert,
-  Info as InfoIcon
+  Alert
 } from '@mui/material';
-import { Refresh, ExpandMore, ExpandLess } from '@mui/icons-material';
+import { Refresh, ExpandMore, ExpandLess, Info as InfoIcon } from '@mui/icons-material';
 
 // الهوايات المحدثة مباشرة في الكود!
 const hobbies = [
