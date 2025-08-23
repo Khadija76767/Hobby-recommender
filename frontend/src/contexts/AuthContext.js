@@ -176,17 +176,38 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     console.log('👋 Logging out and clearing ALL user data...');
     
-    // 🔥 مسح جميع البيانات المحفوظة
+    // 🔥 احفظ معرف المستخدم الحالي قبل المسح لمسح بياناته
+    const currentUserId = currentUser?.id;
+    
+    // 🔥 مسح جميع البيانات العامة
     localStorage.removeItem('token');
     localStorage.removeItem('userData');
-    localStorage.removeItem('userProfile'); // مسح أي بيانات إضافية
-    localStorage.removeItem('userNotes'); // مسح الملاحظات
-    localStorage.removeItem('userPreferences'); // مسح التفضيلات
+    localStorage.removeItem('userProfile');
+    localStorage.removeItem('userNotes');
+    localStorage.removeItem('userPreferences');
+    localStorage.removeItem('reflections'); // مسح البيانات القديمة غير المرتبطة بمستخدم
+    localStorage.removeItem('dailyReflections'); // مسح البيانات القديمة غير المرتبطة بمستخدم
     
-    // مسح جميع البيانات المتعلقة بالمستخدم من localStorage
+    // 🔥 مسح البيانات المرتبطة بالمستخدم الحالي تحديداً
+    if (currentUserId) {
+      localStorage.removeItem(`reflections_user_${currentUserId}`);
+      localStorage.removeItem(`dailyReflections_user_${currentUserId}`);
+      localStorage.removeItem(`profile_user_${currentUserId}`);
+      localStorage.removeItem(`hobbies_user_${currentUserId}`);
+      localStorage.removeItem(`preferences_user_${currentUserId}`);
+    }
+    
+    // 🔥 مسح جميع البيانات التي تبدأ بـ user_, hobby_, note_, profile_, reflection_
     Object.keys(localStorage).forEach(key => {
-      if (key.startsWith('user_') || key.startsWith('hobby_') || key.startsWith('note_')) {
+      if (key.startsWith('user_') || 
+          key.startsWith('hobby_') || 
+          key.startsWith('note_') ||
+          key.startsWith('profile_') ||
+          key.startsWith('reflections_') ||
+          key.startsWith('dailyReflections_') ||
+          key.includes('_user_')) {
         localStorage.removeItem(key);
+        console.log(`🗑️ Removed: ${key}`);
       }
     });
     
@@ -194,6 +215,11 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(null);
     
     console.log('✅ All user data cleared successfully!');
+    
+    // 🔥 إعادة تحميل الصفحة لضمان مسح جميع البيانات من الذاكرة
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   };
 
   // دالة لتحديث بيانات المستخدم بدون API calls

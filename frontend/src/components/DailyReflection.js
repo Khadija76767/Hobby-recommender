@@ -2,15 +2,18 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  TextField,
   Button,
-  IconButton,
+  TextField,
+  Paper,
+  Fade,
+  Chip,
   Collapse,
+  Divider,
+  IconButton,
 } from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
-import DeleteIcon from '@mui/icons-material/Delete';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import { Save as SaveIcon, VolumeUp, Delete, Visibility, VisibilityOff } from '@mui/icons-material';
 import { speak, stopSpeaking } from '../utils/speech';
+import { useAuth } from '../contexts/AuthContext'; // 🔥 إضافة استيراد useAuth
 
 const REFLECTION_PROMPTS = [
   {
@@ -18,16 +21,16 @@ const REFLECTION_PROMPTS = [
     ar: "ما الذي جعلك تبتسم اليوم؟"
   },
   {
-    en: "What's one thing you learned recently?",
-    ar: "ما هو الشيء الذي تعلمته مؤخراً؟"
+    en: "What are you grateful for?",
+    ar: "ما الذي تشعر بالامتنان له؟"
   },
   {
-    en: "What are you grateful for today?",
-    ar: "ما الذي تشعر بالامتنان له اليوم؟"
+    en: "What's one thing you learned today?",
+    ar: "ما هو الشيء الواحد الذي تعلمته اليوم؟"
   },
   {
-    en: "What's a small victory you had today?",
-    ar: "ما هو الإنجاز الصغير الذي حققته اليوم؟"
+    en: "What hobby brought you joy recently?",
+    ar: "أي هواية جلبت لك السعادة مؤخراً؟"
   },
   {
     en: "What's something you're looking forward to?",
@@ -36,12 +39,19 @@ const REFLECTION_PROMPTS = [
 ];
 
 const DailyReflection = () => {
+  const { currentUser } = useAuth(); // 🔥 استخدام بيانات المستخدم الحالي
   const [currentPrompt, setCurrentPrompt] = useState(REFLECTION_PROMPTS[0]);
   const [reflection, setReflection] = useState('');
+  
+  // 🔥 ربط Reflections بالمستخدم المحدد
   const [savedReflections, setSavedReflections] = useState(() => {
-    const saved = localStorage.getItem('dailyReflections');
+    if (!currentUser) return []; // 🔥 إذا لم يكن هناك مستخدم، أرجع مصفوفة فارغة
+    
+    const userKey = `dailyReflections_user_${currentUser.id}`; // 🔥 مفتاح فريد لكل مستخدم
+    const saved = localStorage.getItem(userKey);
     return saved ? JSON.parse(saved) : [];
   });
+  
   const [speaking, setSpeaking] = useState(false);
   const [language, setLanguage] = useState('en');
   const [showSaved, setShowSaved] = useState(false);
@@ -56,8 +66,23 @@ const DailyReflection = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('dailyReflections', JSON.stringify(savedReflections));
-  }, [savedReflections]);
+    // 🔥 حفظ البيانات مع مفتاح فريد للمستخدم
+    if (currentUser) {
+      const userKey = `dailyReflections_user_${currentUser.id}`;
+      localStorage.setItem(userKey, JSON.stringify(savedReflections));
+    }
+  }, [savedReflections, currentUser]);
+
+  // 🔥 تحديث البيانات عند تغيير المستخدم
+  useEffect(() => {
+    if (currentUser) {
+      const userKey = `dailyReflections_user_${currentUser.id}`;
+      const saved = localStorage.getItem(userKey);
+      setSavedReflections(saved ? JSON.parse(saved) : []);
+    } else {
+      setSavedReflections([]);
+    }
+  }, [currentUser]);
 
   const handleSpeak = async (text) => {
     setSpeaking(true);
@@ -71,12 +96,13 @@ const DailyReflection = () => {
   };
 
   const handleSave = () => {
-    if (reflection.trim()) {
+    if (reflection.trim() && currentUser) {
       const newReflection = {
         prompt: currentPrompt[language],
         text: reflection,
         date: new Date().toISOString(),
-        language
+        language,
+        userId: currentUser.id, // 🔥 إضافة معرف المستخدم
       };
       setSavedReflections([newReflection, ...savedReflections]);
       setReflection('');
@@ -100,6 +126,17 @@ const DailyReflection = () => {
       minute: 'numeric'
     }).format(date);
   };
+
+  // 🔥 إذا لم يكن هناك مستخدم مسجل دخول، اعرض رسالة
+  if (!currentUser) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant="h6" color="text.secondary">
+          Please log in to access your personal reflections
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box className="daily-reflection">
@@ -151,7 +188,7 @@ const DailyReflection = () => {
           disabled={speaking}
           size="small"
         >
-          <VolumeUpIcon />
+          <VolumeUp />
         </IconButton>
       </Box>
 
@@ -256,7 +293,7 @@ const DailyReflection = () => {
                   [item.language === 'ar' ? 'left' : 'right']: 8,
                 }}
               >
-                <DeleteIcon fontSize="small" />
+                <Delete fontSize="small" />
               </IconButton>
             </Box>
           ))}

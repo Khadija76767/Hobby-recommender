@@ -15,6 +15,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTheme } from '@mui/material/styles';
+import { useAuth } from '../contexts/AuthContext'; // 🔥 إضافة استيراد useAuth
 
 const MOODS = [
   { emoji: '😊', label: 'Happy' },
@@ -42,17 +43,22 @@ const STICKER_COLORS = [
   'linear-gradient(135deg, #FFE8D6 0%, #FFB7B2 100%)',
   'linear-gradient(135deg, #E2F0CB 0%, #B7E4C7 100%)',
   'linear-gradient(135deg, #D4E7FF 0%, #B7C0FF 100%)',
-  'linear-gradient(135deg, #FFE8F5 0%, #FFB5E8 100%)',
   'linear-gradient(135deg, #FFF3B0 0%, #FFE66D 100%)',
 ];
 
 const DailyReflection = () => {
   const theme = useTheme();
+  const { currentUser } = useAuth(); // 🔥 استخدام بيانات المستخدم الحالي
   const [reflection, setReflection] = useState('');
   const [selectedMood, setSelectedMood] = useState(null);
   const [currentPrompt, setCurrentPrompt] = useState('');
+  
+  // 🔥 ربط Reflections بالمستخدم المحدد
   const [savedReflections, setSavedReflections] = useState(() => {
-    const saved = localStorage.getItem('reflections');
+    if (!currentUser) return []; // 🔥 إذا لم يكن هناك مستخدم، أرجع مصفوفة فارغة
+    
+    const userKey = `reflections_user_${currentUser.id}`; // 🔥 مفتاح فريد لكل مستخدم
+    const saved = localStorage.getItem(userKey);
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -63,16 +69,32 @@ const DailyReflection = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('reflections', JSON.stringify(savedReflections));
-  }, [savedReflections]);
+    // 🔥 حفظ البيانات مع مفتاح فريد للمستخدم
+    if (currentUser) {
+      const userKey = `reflections_user_${currentUser.id}`;
+      localStorage.setItem(userKey, JSON.stringify(savedReflections));
+    }
+  }, [savedReflections, currentUser]);
+
+  // 🔥 تحديث البيانات عند تغيير المستخدم
+  useEffect(() => {
+    if (currentUser) {
+      const userKey = `reflections_user_${currentUser.id}`;
+      const saved = localStorage.getItem(userKey);
+      setSavedReflections(saved ? JSON.parse(saved) : []);
+    } else {
+      setSavedReflections([]);
+    }
+  }, [currentUser]);
 
   const handleSave = () => {
-    if (reflection.trim()) {
+    if (reflection.trim() && currentUser) {
       const newReflection = {
         text: reflection,
         mood: selectedMood,
         prompt: currentPrompt,
         date: new Date().toISOString(),
+        userId: currentUser.id, // 🔥 إضافة معرف المستخدم
       };
       setSavedReflections([newReflection, ...savedReflections]);
       setReflection('');
@@ -95,6 +117,19 @@ const DailyReflection = () => {
       minute: 'numeric',
     }).format(new Date(dateString));
   };
+
+  // 🔥 إذا لم يكن هناك مستخدم مسجل دخول، اعرض رسالة
+  if (!currentUser) {
+    return (
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Paper elevation={3} sx={{ p: 3, textAlign: 'center' }}>
+          <Typography variant="h6" color="text.secondary">
+            Please log in to access your personal reflections
+          </Typography>
+        </Paper>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>

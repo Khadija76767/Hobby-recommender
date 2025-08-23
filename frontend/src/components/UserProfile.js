@@ -35,21 +35,45 @@ const UserProfile = () => {
 
   const fetchProfile = async () => {
     try {
+      // 🔥 محاولة استرجاع البيانات من API أولاً
       const response = await api.get('/api/auth/profile');
       setProfile(response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching profile:', error);
-      setNotification({
-        type: 'error',
-        message: 'Failed to load profile. Please try again.',
-      });
-      setLoading(false);
+      
+      // 🔥 إذا فشل API، استخدم بيانات المستخدم من AuthContext
+      if (currentUser) {
+        console.log('🔄 Using currentUser data as fallback:', currentUser);
+        
+        // 🔥 استخدام بيانات المستخدم الحقيقية من AuthContext
+        const fallbackProfile = {
+          display_name: currentUser.display_name || currentUser.username || '',
+          avatar_url: currentUser.avatar_url || '',
+          user_code: currentUser.user_code || '',
+        };
+        
+        setProfile(fallbackProfile);
+        setLoading(false);
+      } else {
+        // 🔥 إذا لم يكن هناك مستخدم، إنشاء بروفايل فارغ
+        setProfile({
+          display_name: '',
+          avatar_url: '',
+          user_code: 'NEW_USER',
+        });
+        setNotification({
+          type: 'error',
+          message: 'Please log in to access your profile.',
+        });
+        setLoading(false);
+      }
     }
   };
 
   const handleSave = async () => {
     try {
+      // 🔥 محاولة حفظ البيانات عبر API أولاً
       await api.post('/api/auth/profile', {
         display_name: profile.display_name,
       });
@@ -64,10 +88,31 @@ const UserProfile = () => {
       });
     } catch (error) {
       console.error('Error updating profile:', error);
-      setNotification({
-        type: 'error',
-        message: 'Failed to update profile. Please try again.',
-      });
+      
+      // 🔥 إذا فشل API، احفظ البيانات محلياً مع ربطها بالمستخدم
+      if (currentUser) {
+        const userKey = `profile_user_${currentUser.id}`;
+        const profileData = {
+          display_name: profile.display_name,
+          avatar_url: profile.avatar_url,
+          user_code: profile.user_code,
+          userId: currentUser.id,
+          lastUpdated: new Date().toISOString()
+        };
+        
+        localStorage.setItem(userKey, JSON.stringify(profileData));
+        
+        setIsEditing(false);
+        setNotification({
+          type: 'success',
+          message: 'Profile saved locally! (No internet connection)',
+        });
+      } else {
+        setNotification({
+          type: 'error',
+          message: 'Please log in to save your profile.',
+        });
+      }
     }
   };
 
