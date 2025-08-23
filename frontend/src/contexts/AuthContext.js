@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     console.log("🚀 API Base URL:", process.env.REACT_APP_API_URL);
-    console.log("🔥 AuthContext initializing...");
+    console.log("🔥 AuthContext initializing... [v1.0.0-build-202501121530]");
     
     // إذا كان هناك token، محاولة استرجاع بيانات المستخدم الحقيقية
     if (token) {
@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }) => {
           const userData = JSON.parse(savedUserData);
           setCurrentUser(userData);
           console.log('✅ User session restored from localStorage:', userData);
+          console.log('🆔 User ID for data separation:', userData.id);
         } catch (error) {
           console.log('❌ Error parsing saved user data, clearing localStorage');
           localStorage.removeItem('userData');
@@ -38,6 +39,8 @@ export const AuthProvider = ({ children }) => {
           setToken(null);
         }
       }
+    } else {
+      console.log('❌ No token found, user needs to login');
     }
     
     setLoading(false);

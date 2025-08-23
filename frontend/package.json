@@ -1,6 +1,6 @@
 {
   "name": "hobby-recommender-frontend",
-  "version": "0.1.0",
+  "version": "1.0.0-build-202501121530",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -20,8 +20,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "set PORT=3000 && react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts start",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
