@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
+  Grid,
+  Paper,
   Typography,
   Button,
   TextField,
-  Grid,
+  Avatar,
   IconButton,
-  Collapse,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import { useTheme } from '@mui/material/styles';
 import { speak, stopSpeaking } from '../utils/speech';
+import { useAuth } from '../contexts/AuthContext'; // 🔥 إضافة استيراد useAuth
 
 const DAILY_AFFIRMATIONS = [
   {
@@ -58,15 +66,32 @@ const MOOD_RESPONSES = {
 };
 
 const RobotAssistant = ({ onMoodChange }) => {
+  const { currentUser } = useAuth(); // 🔥 استخدام بيانات المستخدم الحالي
+  
   const [currentAffirmation, setCurrentAffirmation] = useState(DAILY_AFFIRMATIONS[0]);
   const [userMood, setUserMood] = useState('');
   const [showMoodInput, setShowMoodInput] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [language, setLanguage] = useState('en');
+  
+  // 🔥 ربط اسم المستخدم بالمستخدم المحدد
   const [userName, setUserName] = useState(() => {
-    return localStorage.getItem('userName') || '';
+    if (!currentUser) return '';
+    
+    const userKey = `userName_user_${currentUser.id}`; // 🔥 مفتاح فريد لكل مستخدم
+    const savedName = localStorage.getItem(userKey);
+    return savedName || currentUser.display_name || currentUser.username || '';
   });
-  const [showNameInput, setShowNameInput] = useState(!localStorage.getItem('userName'));
+  
+  // 🔥 تحديد متى نعرض نافذة إدخال الاسم
+  const [showNameInput, setShowNameInput] = useState(() => {
+    if (!currentUser) return false;
+    
+    const userKey = `userName_user_${currentUser.id}`;
+    const savedName = localStorage.getItem(userKey);
+    // اعرض نافذة الاسم إذا لم يكن هناك اسم محفوظ للمستخدم الحالي
+    return !savedName && !currentUser.display_name;
+  });
 
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * DAILY_AFFIRMATIONS.length);
@@ -76,6 +101,32 @@ const RobotAssistant = ({ onMoodChange }) => {
       stopSpeaking();
     };
   }, []);
+
+  // 🔥 تحديث البيانات عند تغيير المستخدم
+  useEffect(() => {
+    if (currentUser) {
+      const userKey = `userName_user_${currentUser.id}`;
+      const savedName = localStorage.getItem(userKey);
+      
+      if (savedName) {
+        setUserName(savedName);
+        setShowNameInput(false);
+      } else if (currentUser.display_name || currentUser.username) {
+        // استخدم اسم المستخدم من البروفايل إذا متوفر
+        const defaultName = currentUser.display_name || currentUser.username;
+        setUserName(defaultName);
+        localStorage.setItem(userKey, defaultName); // احفظه للمرة القادمة
+        setShowNameInput(false);
+      } else {
+        // اطلب من المستخدم إدخال اسم
+        setUserName('');
+        setShowNameInput(true);
+      }
+    } else {
+      setUserName('');
+      setShowNameInput(false);
+    }
+  }, [currentUser]);
 
   const handleSpeak = async (text) => {
     setSpeaking(true);
@@ -96,9 +147,13 @@ const RobotAssistant = ({ onMoodChange }) => {
 
   const handleNameSubmit = (e) => {
     e.preventDefault();
-    if (userName.trim()) {
-      localStorage.setItem('userName', userName);
+    if (userName.trim() && currentUser) {
+      // 🔥 حفظ الاسم مع مفتاح فريد للمستخدم
+      const userKey = `userName_user_${currentUser.id}`;
+      localStorage.setItem(userKey, userName.trim());
       setShowNameInput(false);
+      
+      console.log(`🏷️ Name saved for user ${currentUser.id}: ${userName.trim()}`);
     }
   };
 
@@ -113,6 +168,43 @@ const RobotAssistant = ({ onMoodChange }) => {
       ? "Thank you for sharing! Let's find something that matches your mood!"
       : "شكراً لمشاركتك! دعنا نجد شيئاً يناسب مزاجك!";
   };
+
+  // 🔥 إذا لم يكن هناك مستخدم مسجل دخول
+  if (!currentUser) {
+    return (
+      <Grid container spacing={3} alignItems="center">
+        <Grid item xs={12} md={4}>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
+              borderRadius: 3,
+              textAlign: 'center',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+            }}
+          >
+            <Avatar
+              sx={{
+                width: 80,
+                height: 80,
+                margin: '0 auto 16px',
+                fontSize: '2rem',
+              }}
+            >
+              🐼
+            </Avatar>
+            <Typography variant="h6" gutterBottom>
+              Welcome!
+            </Typography>
+            <Typography variant="body2">
+              Please log in to get personalized assistance
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    );
+  }
 
   return (
     <Grid container spacing={3} alignItems="center">

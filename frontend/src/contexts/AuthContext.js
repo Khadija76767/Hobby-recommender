@@ -198,6 +198,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem(`profile_user_${currentUserId}`);
       localStorage.removeItem(`hobbies_user_${currentUserId}`);
       localStorage.removeItem(`preferences_user_${currentUserId}`);
+      localStorage.removeItem(`userName_user_${currentUserId}`); // 🔥 مسح اسم المستخدم أيضاً
     }
     
     // 🔥 مسح جميع البيانات التي تبدأ بـ user_, hobby_, note_, profile_, reflection_
@@ -208,6 +209,7 @@ export const AuthProvider = ({ children }) => {
           key.startsWith('profile_') ||
           key.startsWith('reflections_') ||
           key.startsWith('dailyReflections_') ||
+          key.startsWith('userName_') || // 🔥 مسح جميع أسماء المستخدمين
           key.includes('_user_')) {
         localStorage.removeItem(key);
         console.log(`🗑️ Removed: ${key}`);
