@@ -23,11 +23,6 @@ const features = [
     description: 'Discover a new hobby every day that matches your interests and brings joy to your life.',
   },
   {
-    icon: <PsychologyIcon fontSize="large" color="primary" />,
-    title: 'Personalized Experience',
-    description: 'Get personalized hobby recommendations based on your interests and preferences.',
-  },
-  {
     icon: <TrackChangesIcon fontSize="large" color="primary" />,
     title: 'Journey Tracking',
     description: 'Keep track of your progress and celebrate your achievements as you explore new hobbies.',
