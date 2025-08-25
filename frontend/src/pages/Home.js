@@ -10,7 +10,6 @@ import {
   Card,
   CardContent,
   CardMedia,
-  CardActions,
 } from '@mui/material';
 import ExploreIcon from '@mui/icons-material/Explore';
 import PsychologyIcon from '@mui/icons-material/Psychology';
@@ -161,9 +160,6 @@ const Home = () => {
                   {hobby.description}
                 </Typography>
               </CardContent>
-              <CardActions>
-                <Button size="small" color="primary">Learn More</Button>
-              </CardActions>
             </Card>
           </Grid>
         ))}
