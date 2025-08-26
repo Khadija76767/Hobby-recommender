@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, EmailStr
 import random
 import os
@@ -481,6 +482,48 @@ def get_profile(current_user = Depends(get_current_user)):
         "avatar_url": current_user.get("avatar_url", None)
     }
 
+@app.post("/api/auth/profile/avatar")
+async def upload_avatar(
+    file: UploadFile = File(...),
+    current_user = Depends(get_current_user)
+):
+    """Upload user avatar."""
+    try:
+        # Import here to avoid issues if not available
+        import shutil
+        from fastapi import UploadFile, File
+        
+        # Create user directory if it doesn't exist
+        user_dir = os.path.join(AVATARS_DIR, str(current_user.get("id", 1)))
+        os.makedirs(user_dir, exist_ok=True)
+
+        # Save the file
+        file_path = os.path.join(user_dir, file.filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        # Create avatar URL
+        avatar_url = f"/avatars/{current_user.get('id', 1)}/{file.filename}"
+        
+        # If database is available, update user
+        if DATABASE_AVAILABLE and SessionLocal:
+            db = SessionLocal()
+            try:
+                user = db.query(User).filter(User.id == current_user.get("id", 1)).first()
+                if user:
+                    user.avatar_url = avatar_url
+                    db.commit()
+            finally:
+                db.close()
+
+        return {"avatar_url": avatar_url, "message": "Avatar uploaded successfully!"}
+    except Exception as e:
+        print(f"Error uploading avatar: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not upload avatar"
+        )
+
 # اختبار قاعدة البيانات
 @app.get("/api/database/test")
 def test_database(db: Session = Depends(get_db)):
@@ -573,3 +616,12 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# Mount avatars directory for serving uploaded images
+# First check if avatars directory exists, if not create it
+AVATARS_DIR = os.path.join("frontend", "public", "avatars")
+if not os.path.exists(AVATARS_DIR):
+    os.makedirs(AVATARS_DIR, exist_ok=True)
+    
+# Mount the avatars directory
+app.mount("/avatars", StaticFiles(directory=AVATARS_DIR), name="avatars")
