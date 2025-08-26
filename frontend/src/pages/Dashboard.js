@@ -27,6 +27,7 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import RobotAssistant from '../components/RobotAssistant';
 import HobbySuggestion from '../components/HobbySuggestion';
+import ConnectWithFriends from '../components/ConnectWithFriends';
 
 // Tab panel component
 function TabPanel(props) {
@@ -60,6 +61,7 @@ const Dashboard = () => {
   const theme = useTheme();
   const [currentMood, setCurrentMood] = useState('');
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [currentHobbyForSharing, setCurrentHobbyForSharing] = useState("Daily Hobby");
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -182,7 +184,10 @@ const Dashboard = () => {
 
           {/* Hobby Suggestion */}
           <Grid item xs={12} md={8}>
-            <HobbySuggestion mood={currentMood} />
+            <HobbySuggestion 
+              mood={currentMood} 
+              onHobbySelect={setCurrentHobbyForSharing}
+            />
           </Grid>
 
           {/* Daily Reflection Button */}
@@ -232,14 +237,36 @@ const Dashboard = () => {
                   borderRadius: 3,
                 }}
               >
-                Write Today's Reflection
-              </Button>
-            </Paper>
-          </Grid>
+                              Write Today's Reflection
+            </Button>
+          </Paper>
         </Grid>
-      </Container>
-    </Box>
-  );
+
+        {/* Connect with Friends */}
+        <Grid item xs={12}>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
+              borderRadius: 4,
+              background: 'linear-gradient(135deg, #F0F8FF 0%, #E8F5E8 100%)',
+            }}
+          >
+            <Typography
+              variant="h5"
+              fontFamily="Patrick Hand"
+              gutterBottom
+              sx={{ color: theme.palette.primary.main, mb: 3 }}
+            >
+              🤝 Connect & Share with Friends
+            </Typography>
+            <ConnectWithFriends currentHobby={currentHobbyForSharing} />
+          </Paper>
+        </Grid>
+      </Grid>
+    </Container>
+  </Box>
+);
 };
 
 export default Dashboard; 

@@ -44,7 +44,7 @@ const hobbies = [
   {"id": 27, "name": "رسم الأشكال الهندسية المتداخلة", "description": "ارسمي دوائر، مربعات، مثلثات متداخلة - ستحصلين على تصميمات زخرفية رائعة", "category": "رسم هندسي", "skill_level": "Beginner", "cost_level": "Free"}
 ];
 
-const HobbySuggestion = () => {
+const HobbySuggestion = ({ mood, onHobbySelect }) => {
   const [currentHobby, setCurrentHobby] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -62,6 +62,10 @@ const HobbySuggestion = () => {
     setTimeout(() => {
       setCurrentHobby(randomHobby);
       setLoading(false);
+      // إرسال الهواية المختارة للمكون الأبوي للمشاركة مع الأصدقاء
+      if (onHobbySelect) {
+        onHobbySelect(randomHobby.name);
+      }
     }, 500);
   };
 
