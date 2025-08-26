@@ -33,6 +33,12 @@ const ConnectWithFriends = ({ currentHobby }) => {
   // Load friends from API
   useEffect(() => {
     const fetchFriends = async () => {
+      // فحص إذا كان api متاح
+      if (!api) {
+        console.log('API not available, skipping friends fetch');
+        return;
+      }
+
       try {
         const response = await api.get('/api/auth/friends');
         setFriends(response.data.map(f => ({
@@ -40,39 +46,60 @@ const ConnectWithFriends = ({ currentHobby }) => {
           name: f.display_name || f.username,
           photoURL: f.avatar_url || '/assets/images/default-avatar.png',
           code: f.user_code,
-            hobbies: []
-          })));
+          hobbies: []
+        })));
       } catch (error) {
         console.error('Error fetching friends:', error);
+        // استخدام بيانات افتراضية بدلاً من إظهار خطأ
+        setFriends([]);
         setNotification({
-          type: 'error',
-          message: 'Failed to load friends. Please try again.',
+          type: 'info',
+          message: 'Friends feature temporarily unavailable. Please try again later.',
         });
       }
     };
 
-    fetchFriends();
-  }, [api]);
+    if (currentUser) {
+      fetchFriends();
+    }
+  }, [api, currentUser]);
 
   const handleAddFriend = async () => {
+    // فحص إذا كان api متاح
+    if (!api) {
+      setNotification({
+        type: 'error',
+        message: 'Friends feature temporarily unavailable. Please try again later.',
+      });
+      return;
+    }
+
+    if (!friendCode.trim()) {
+      setNotification({
+        type: 'error',
+        message: 'Please enter a friend code.',
+      });
+      return;
+    }
+
     try {
       const response = await api.post(`/api/auth/friends/${friendCode}`);
       const friendData = response.data;
       
-        const newFriend = {
-          id: friendData.id,
+      const newFriend = {
+        id: friendData.id,
         name: friendData.display_name || friendData.username,
-          photoURL: friendData.avatar_url || '/assets/images/default-avatar.png',
-          code: friendData.user_code,
-          hobbies: []
-        };
+        photoURL: friendData.avatar_url || '/assets/images/default-avatar.png',
+        code: friendData.user_code,
+        hobbies: []
+      };
 
-        setFriends(prev => [...prev, newFriend]);
-        setFriendCode('');
-        setNotification({
-          type: 'success',
-          message: `Added ${newFriend.name} as a friend! 🎉`,
-        });
+      setFriends(prev => [...prev, newFriend]);
+      setFriendCode('');
+      setNotification({
+        type: 'success',
+        message: `Added ${newFriend.name} as a friend! 🎉`,
+      });
     } catch (error) {
       console.error('Error adding friend:', error);
       setNotification({

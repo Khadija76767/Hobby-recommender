@@ -241,6 +241,7 @@ export const AuthProvider = ({ children }) => {
     token,
     loading,
     isAuthenticated: !!token && !!currentUser, // إضافة isAuthenticated
+    api, // إضافة api instance
     login,
     register,
     logout,

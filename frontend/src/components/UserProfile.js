@@ -35,6 +35,12 @@ const UserProfile = () => {
 
   const fetchProfile = async () => {
     try {
+      // 🔥 فحص إذا كان api متاح
+      if (!api) {
+        console.log('API not available, using currentUser data');
+        throw new Error('API not available');
+      }
+
       // 🔥 محاولة استرجاع البيانات من API أولاً
       const response = await api.get('/api/auth/profile');
       setProfile(response.data);
@@ -120,6 +126,15 @@ const UserProfile = () => {
     const file = event.target.files[0];
     if (!file) return;
 
+    // 🔥 فحص إذا كان api متاح
+    if (!api) {
+      setNotification({
+        type: 'error',
+        message: 'Avatar upload temporarily unavailable. Please try again later.',
+      });
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
 
@@ -133,7 +148,9 @@ const UserProfile = () => {
 
       // Update both local state and context
       setProfile(prev => ({ ...prev, avatar_url: response.data.avatar_url }));
-      await updateUserData();
+      if (updateUserData) {
+        await updateUserData();
+      }
 
       setNotification({
         type: 'success',
