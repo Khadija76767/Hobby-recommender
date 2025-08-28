@@ -124,6 +124,17 @@ const Home = () => {
       dir={language === 'ar' ? 'rtl' : 'ltr'}
       sx={{ textAlign: language === 'ar' ? 'right' : 'left' }}
     >
+      {/* Language Toggle */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mb: 2 }}>
+        <Button
+          variant="outlined"
+          onClick={toggleLanguage}
+          startIcon={<LanguageIcon />}
+          sx={{ fontWeight: 'bold' }}
+        >
+          {t.languageToggle}
+        </Button>
+      </Box>
     <Container maxWidth="lg">
       {/* Hero Section */}
       <Paper

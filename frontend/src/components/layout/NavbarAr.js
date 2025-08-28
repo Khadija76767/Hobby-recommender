@@ -18,27 +18,25 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useAuth } from '../../contexts/AuthContext';
-import { useLanguage } from '../../contexts/LanguageContext';
 import LanguageIcon from '@mui/icons-material/Language';
+import { useAuth } from '../../contexts/AuthContext';
 
-const pages = [
-  { name: 'Home', path: '/' },
-  { name: 'Hobby Corner', path: '/dashboard', auth: true },
-  { name: 'Daily Journal', path: '/reflection', auth: true },
+const pagesAr = [
+  { name: 'الرئيسية', path: '/' },
+  { name: 'ركن الهوايات', path: '/dashboard', auth: true },
+  { name: 'يوميات الذات', path: '/reflection', auth: true },
 ];
 
-const settings = [
-  { name: 'Profile', path: '/profile', icon: <AccountCircleIcon /> },
-  { name: 'Settings', path: '/settings', icon: <SettingsIcon /> },
-  { name: 'Logout', icon: <LogoutIcon /> },
+const settingsAr = [
+  { name: 'الملف الشخصي', path: '/profile', icon: <AccountCircleIcon /> },
+  { name: 'الإعدادات', path: '/settings', icon: <SettingsIcon /> },
+  { name: 'تسجيل الخروج', icon: <LogoutIcon /> },
 ];
 
-const Navbar = () => {
+const NavbarAr = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const { currentUser, logout } = useAuth();
-  const { language, toggleLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -57,21 +55,42 @@ const Navbar = () => {
     setAnchorElUser(null);
   };
 
-  const handleMenuClick = (setting) => {
-    handleCloseUserMenu();
-    if (setting.name === 'Logout') {
-      logout();
+  const handleLogout = async () => {
+    try {
+      await logout();
       navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+    handleCloseUserMenu();
+  };
+
+  const handleMenuClick = (setting) => {
+    if (setting.name === 'تسجيل الخروج') {
+      handleLogout();
     } else if (setting.path) {
       navigate(setting.path);
     }
+    handleCloseUserMenu();
+  };
+
+  const switchToEnglish = () => {
+    localStorage.setItem('app_language', 'en');
+    window.location.reload();
   };
 
   return (
-    <AppBar position="sticky" sx={{ bgcolor: 'white', boxShadow: 1 }}>
+    <AppBar 
+      position="static" 
+      sx={{ 
+        background: 'linear-gradient(135deg, #FFB5E8 0%, #B5DEFF 100%)',
+        color: '#4A4A4A',
+        direction: 'rtl'
+      }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          {/* Logo for larger screens */}
+          {/* Desktop Logo */}
           <Typography
             variant="h6"
             noWrap
@@ -81,24 +100,24 @@ const Navbar = () => {
               mr: 2,
               display: { xs: 'none', md: 'flex' },
               fontFamily: 'Patrick Hand',
+              fontSize: '1.8rem',
               fontWeight: 700,
               color: theme.palette.primary.main,
               textDecoration: 'none',
             }}
           >
-            Celeste
+            سليست
           </Typography>
 
           {/* Mobile menu */}
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
+              aria-label="فتح القائمة"
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
               color="inherit"
-              sx={{ color: theme.palette.primary.main }}
             >
               <MenuIcon />
             </IconButton>
@@ -107,12 +126,12 @@ const Navbar = () => {
               anchorEl={anchorElNav}
               anchorOrigin={{
                 vertical: 'bottom',
-                horizontal: 'left',
+                horizontal: 'right',
               }}
               keepMounted
               transformOrigin={{
                 vertical: 'top',
-                horizontal: 'left',
+                horizontal: 'right',
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
@@ -120,24 +139,22 @@ const Navbar = () => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              {pages.map((page) => (
+              {pagesAr.map((page) => (
                 (!page.auth || currentUser) && (
-                  <MenuItem
-                    key={page.name}
+                  <MenuItem 
+                    key={page.name} 
                     onClick={handleCloseNavMenu}
                     component={RouterLink}
                     to={page.path}
                   >
-                    <Typography textAlign="center" fontFamily="Patrick Hand">
-                      {page.name}
-                    </Typography>
+                    <Typography textAlign="center">{page.name}</Typography>
                   </MenuItem>
                 )
               ))}
             </Menu>
           </Box>
 
-          {/* Logo for mobile */}
+          {/* Mobile Logo */}
           <Typography
             variant="h5"
             noWrap
@@ -148,17 +165,18 @@ const Navbar = () => {
               display: { xs: 'flex', md: 'none' },
               flexGrow: 1,
               fontFamily: 'Patrick Hand',
+              fontSize: '1.5rem',
               fontWeight: 700,
               color: theme.palette.primary.main,
               textDecoration: 'none',
             }}
           >
-            Celeste
+            سليست
           </Typography>
 
           {/* Desktop menu */}
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
+            {pagesAr.map((page) => (
               (!page.auth || currentUser) && (
                 <Button
                   key={page.name}
@@ -181,13 +199,31 @@ const Navbar = () => {
             ))}
           </Box>
 
+          {/* Language Toggle */}
+          <Box sx={{ ml: 2 }}>
+            <Tooltip title="التبديل للإنجليزية">
+              <Button
+                variant="outlined"
+                onClick={switchToEnglish}
+                startIcon={<LanguageIcon />}
+                sx={{ 
+                  fontWeight: 'bold',
+                  minWidth: 'auto',
+                  px: 2
+                }}
+              >
+                English
+              </Button>
+            </Tooltip>
+          </Box>
+
           {/* User menu */}
           {currentUser ? (
             <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
+              <Tooltip title="فتح الإعدادات">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar
-                    alt={currentUser.display_name || currentUser.full_name || 'User'}
+                    alt={currentUser.display_name || currentUser.full_name || 'المستخدم'}
                     src={currentUser.avatar_url || '/assets/images/default-avatar.png'}
                     sx={{ bgcolor: theme.palette.primary.main }}
                   />
@@ -199,62 +235,44 @@ const Navbar = () => {
                 anchorEl={anchorElUser}
                 anchorOrigin={{
                   vertical: 'top',
-                  horizontal: 'right',
+                  horizontal: 'left',
                 }}
                 keepMounted
                 transformOrigin={{
                   vertical: 'top',
-                  horizontal: 'right',
+                  horizontal: 'left',
                 }}
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
-                  <MenuItem
-                    key={setting.name}
-                    onClick={() => handleMenuClick(setting)}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      minWidth: 150,
-                    }}
-                  >
-                    {setting.icon}
-                    <Typography textAlign="center">{setting.name}</Typography>
+                {settingsAr.map((setting) => (
+                  <MenuItem key={setting.name} onClick={() => handleMenuClick(setting)}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {setting.icon}
+                      <Typography textAlign="center">{setting.name}</Typography>
+                    </Box>
                   </MenuItem>
                 ))}
               </Menu>
             </Box>
           ) : (
-            <Box sx={{ flexGrow: 0, display: 'flex', gap: 2 }}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
                 component={RouterLink}
                 to="/login"
-                variant="outlined"
-                sx={{
-                  color: theme.palette.primary.main,
-                  borderColor: theme.palette.primary.main,
-                  '&:hover': {
-                    borderColor: theme.palette.primary.dark,
-                    bgcolor: 'rgba(255, 181, 232, 0.1)',
-                  },
-                }}
+                color="inherit"
+                sx={{ fontFamily: 'Patrick Hand' }}
               >
-                Login
+                تسجيل الدخول
               </Button>
               <Button
                 component={RouterLink}
                 to="/register"
                 variant="contained"
-                sx={{
-                  bgcolor: theme.palette.primary.main,
-                  '&:hover': {
-                    bgcolor: theme.palette.primary.dark,
-                  },
-                }}
+                color="secondary"
+                sx={{ fontFamily: 'Patrick Hand' }}
               >
-                Sign Up
+                التسجيل
               </Button>
             </Box>
           )}
@@ -264,4 +282,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar; 
+export default NavbarAr; 
