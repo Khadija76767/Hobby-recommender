@@ -588,14 +588,20 @@ def add_friend(
             finally:
                 db.close()
 
-        # Fallback: return mock friend data
-        return {
-            "id": 999,
-            "username": f"user_{code}",
-            "display_name": f"Friend {code}",
-            "user_code": code,
-            "avatar_url": None
-        }
+        # Fallback: return mock friend data for demo codes
+        if code in ["DEMO123", "TEST123", "FRIEND1", "BUDDY1"]:
+            return {
+                "id": 999,
+                "username": f"user_{code}",
+                "display_name": f"Demo Friend ({code})",
+                "user_code": code,
+                "avatar_url": None
+            }
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail="User not found"
+            )
     except HTTPException:
         raise
     except Exception as e:
@@ -682,10 +688,69 @@ def get_hobbies():
 
 @app.get("/api/hobbies/daily")
 def daily_hobby():
-    hobby = random.choice(hobbies)
+    """
+    نظام الهوايات اليومية الذكي:
+    - كل يوم 4 هوايات جديدة من الـ 54
+    - لا تكرر نفس الهوايات لمدة 14 يوم
+    - بعد انتهاء الدورة، تبدأ دورة جديدة عشوائية
+    """
+    from datetime import datetime
+    import math
+    
+    # حساب اليوم منذ بداية العام (للثبات عبر المستخدمين)
+    today = datetime.now()
+    day_of_year = today.timetuple().tm_yday
+    
+    # كل دورة = 14 يوم (54 هواية ÷ 4 = 13.5 ≈ 14 يوم)
+    cycle_length = 14
+    hobbies_per_day = 4
+    
+    # تحديد الدورة الحالية واليوم داخل الدورة
+    current_cycle = (day_of_year - 1) // cycle_length
+    day_in_cycle = (day_of_year - 1) % cycle_length
+    
+    # إنشاء seed للعشوائية بناءً على الدورة (لضمان عشوائية مختلفة كل دورة)
+    import random
+    random.seed(current_cycle)
+    
+    # خلط الهوايات بطريقة عشوائية لهذه الدورة
+    cycle_hobbies = hobbies.copy()
+    random.shuffle(cycle_hobbies)
+    
+    # حساب الهوايات لليوم الحالي
+    start_index = day_in_cycle * hobbies_per_day
+    end_index = min(start_index + hobbies_per_day, len(cycle_hobbies))
+    
+    # الحصول على هوايات اليوم
+    daily_hobbies = cycle_hobbies[start_index:end_index]
+    
+    # إذا لم نحصل على 4 هوايات، أكمل من البداية
+    if len(daily_hobbies) < hobbies_per_day:
+        needed = hobbies_per_day - len(daily_hobbies)
+        daily_hobbies.extend(cycle_hobbies[:needed])
+    
+    # معلومات إضافية للمستخدم
+    remaining_days = cycle_length - day_in_cycle
+    total_hobbies_shown = min((day_in_cycle + 1) * hobbies_per_day, len(hobbies))
+    
+    # رسالة توضيحية
+    if day_in_cycle == 0:
+        message = f"🎉 دورة جديدة! 4 هوايات فريدة لك اليوم من أصل {len(hobbies)} هواية"
+    elif remaining_days == 1:
+        message = f"🔥 آخر يوم في الدورة! غداً ستبدأ دورة جديدة بترتيب مختلف"
+    else:
+        message = f"✨ هوايات اليوم ({total_hobbies_shown}/{len(hobbies)}) - باقي {remaining_days} أيام في الدورة"
+    
     return {
-        "hobby": hobby, 
-        "message": f"هواية اليوم من بين {len(hobbies)} هواية! 🌟",
+        "hobbies": daily_hobbies,
+        "message": message,
+        "cycle_info": {
+            "current_cycle": current_cycle + 1,
+            "day_in_cycle": day_in_cycle + 1,
+            "remaining_days": remaining_days,
+            "total_hobbies_shown": total_hobbies_shown,
+            "cycle_progress": f"{total_hobbies_shown}/{len(hobbies)}"
+        },
         "system": SYSTEM_MODE
     }
 
@@ -694,7 +759,64 @@ def get_hobby(hobby_id: int):
     hobby = next((h for h in hobbies if h["id"] == hobby_id), None)
     if not hobby:
         raise HTTPException(404, "الهواية غير موجودة")
-    return hobby
+    
+    # إضافة تفاصيل موسعة للهواية
+    detailed_hobby = hobby.copy()
+    
+    # إضافة تفاصيل حسب نوع الهواية
+    category = hobby["category"]
+    
+    if "روحانية" in category:
+        detailed_hobby.update({
+            "time_commitment": "10-30 دقيقة يومياً",
+            "equipment_needed": "لا يوجد - فقط نية صادقة",
+            "benefits": "تطوير الروحانية، السكينة الداخلية، الاتصال مع الله",
+            "detailed_guide": "ابدأ بـ 5 دقائق يومياً، اختر وقت ثابت، ركز على المعنى وليس فقط الحفظ",
+            "tips": ["اختر وقت صافي الذهن", "كرر الآية عدة مرات", "تأمل في معناها", "سجل تقدمك"]
+        })
+    elif "فنون" in category:
+        detailed_hobby.update({
+            "time_commitment": "15-45 دقيقة",
+            "equipment_needed": "ورق، أقلام/ألوان، أو مواد بسيطة متوفرة",
+            "benefits": "تحسين التركيز، التعبير الإبداعي، الاسترخاء الذهني",
+            "detailed_guide": "ابدأ بأشكال بسيطة، لا تقلق من النتيجة، المهم هو الاستمتاع بالعملية",
+            "tips": ["تدرب يومياً ولو 10 دقائق", "تابع فيديوهات تعليمية", "شارك أعمالك مع الأصدقاء", "احتفظ بمجلد لأعمالك"]
+        })
+    elif "فنون رقمية" in category:
+        detailed_hobby.update({
+            "time_commitment": "20-60 دقيقة",
+            "equipment_needed": "جوال/تابلت، تطبيق رسم (Procreate, Adobe Fresco, مجاني)",
+            "benefits": "مهارات تقنية، إبداع رقمي، فرص عمل مستقبلية",
+            "detailed_guide": "نزل تطبيق مجاني، ابدأ بالأدوات الأساسية، تابع دروس يوتيوب، مارس يومياً",
+            "tips": ["ابدأ بـ Procreate Pocket (مدفوع) أو Autodesk Sketchbook (مجاني)", "تعلم طبقات الرسم", "استخدم الفرش المختلفة", "احفظ أعمالك واشرها"]
+        })
+    elif "طبيعة" in category:
+        detailed_hobby.update({
+            "time_commitment": "10-30 دقيقة يومياً",
+            "equipment_needed": "بذور، أكواب/أصص، ماء، تربة (اختياري)",
+            "benefits": "الاتصال مع الطبيعة، الصبر، مراقبة النمو والحياة",
+            "detailed_guide": "ابدأ بالنباتات السهلة، ضع قرب النافذة، اسق بانتظام، راقب التغييرات",
+            "tips": ["ابدأ بالبقدونس أو النعناع", "سجل نمو النبات بالصور", "اقرأ عن النبات الذي تزرعه", "استمتع بالعملية وليس فقط النتيجة"]
+        })
+    elif "تعليم" in category:
+        detailed_hobby.update({
+            "time_commitment": "15-30 دقيقة يومياً",
+            "equipment_needed": "كتاب، جوال/كمبيوتر للبحث، دفتر ملاحظات",
+            "benefits": "توسيع المعرفة، تحسين التركيز، تطوير مهارات جديدة",
+            "detailed_guide": "اختر موضوع يهمك، ابدأ بمصادر بسيطة، لخص ما تعلمته، طبق المعرفة",
+            "tips": ["حدد هدف تعلم واضح", "اقرأ في أوقات نشاطك الذهني", "ناقش ما تعلمته مع آخرين", "اربط المعرفة الجديدة بحياتك"]
+        })
+    else:
+        # تفاصيل عامة للهوايات الأخرى
+        detailed_hobby.update({
+            "time_commitment": "15-45 دقيقة",
+            "equipment_needed": "مواد بسيطة ومتوفرة في المنزل",
+            "benefits": "تطوير مهارات جديدة، الاستمتاع، قضاء وقت مفيد",
+            "detailed_guide": "ابدأ بخطوات بسيطة، تدرب بانتظام، استمتع بالعملية",
+            "tips": ["ابدأ بجلسات قصيرة", "استمتع بالتعلم", "شارك تجربتك", "كن صبوراً مع نفسك"]
+        })
+    
+    return detailed_hobby
 
 @app.post("/api/hobbies/recommend")
 def recommend():
