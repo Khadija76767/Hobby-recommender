@@ -27,6 +27,7 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import RobotAssistant from '../components/RobotAssistant';
 import HobbySuggestion from '../components/HobbySuggestion';
+import DailyHobbies from '../components/DailyHobbies';
 import ConnectWithFriends from '../components/ConnectWithFriends';
 
 // Tab panel component

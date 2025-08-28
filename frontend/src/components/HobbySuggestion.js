@@ -50,23 +50,51 @@ const HobbySuggestion = ({ mood, onHobbySelect }) => {
   const [error, setError] = useState(null);
   const [expanded, setExpanded] = useState(false);
 
-  const fetchRandomHobby = () => {
+  const fetchRandomHobby = async () => {
     setLoading(true);
     setError(null);
     
-    // اختيار هواية عشوائية من القائمة المحدثة
-    const randomIndex = Math.floor(Math.random() * hobbies.length);
-    const randomHobby = hobbies[randomIndex];
-    
-    // محاكاة loading للتجربة
-    setTimeout(() => {
-      setCurrentHobby(randomHobby);
+    try {
+      // استخدام API الجديد للهوايات اليومية
+      const response = await fetch('/api/hobbies/daily');
+      if (!response.ok) {
+        throw new Error('Failed to fetch daily hobbies');
+      }
+      
+      const data = await response.json();
+      
+      // اختيار هواية عشوائية من الهوايات اليومية الـ 4
+      const dailyHobbies = data.hobbies || [];
+      if (dailyHobbies.length > 0) {
+        const randomHobby = dailyHobbies[Math.floor(Math.random() * dailyHobbies.length)];
+        setCurrentHobby(randomHobby);
+        
+        // إرسال الهواية المختارة للمكون الأبوي للمشاركة مع الأصدقاء
+        if (onHobbySelect) {
+          onHobbySelect(randomHobby.name);
+        }
+      } else {
+        // fallback للبيانات المحلية
+        const randomIndex = Math.floor(Math.random() * hobbies.length);
+        const randomHobby = hobbies[randomIndex];
+        setCurrentHobby(randomHobby);
+        if (onHobbySelect) {
+          onHobbySelect(randomHobby.name);
+        }
+      }
+      
       setLoading(false);
-      // إرسال الهواية المختارة للمكون الأبوي للمشاركة مع الأصدقاء
+    } catch (error) {
+      console.error('Error fetching daily hobbies:', error);
+      // استخدام البيانات المحلية كـ fallback
+      const randomIndex = Math.floor(Math.random() * hobbies.length);
+      const randomHobby = hobbies[randomIndex];
+      setCurrentHobby(randomHobby);
       if (onHobbySelect) {
         onHobbySelect(randomHobby.name);
       }
-    }, 500);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
