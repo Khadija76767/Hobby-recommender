@@ -19,6 +19,8 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
+import LanguageIcon from '@mui/icons-material/Language';
 
 const pages = [
   { name: 'Home', path: '/' },

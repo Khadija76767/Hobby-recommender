@@ -15,6 +15,7 @@ import DailyReflection from './pages/DailyReflection';
 import UserProfile from './components/UserProfile';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 function App() {
   return (
