@@ -30,6 +30,11 @@ const features = [
     title: 'Journey Tracking',
     description: 'Keep track of your progress and celebrate your achievements as you explore new hobbies.',
   },
+  {
+    icon: <CalendarTodayIcon fontSize="large" color="primary" />,
+    title: 'Smart Daily System',
+    description: 'Get 4 unique hobbies every day - no duplicates for 2 weeks, then a fresh cycle starts!',
+  },
 ];
 
 const popularHobbies = [
@@ -109,115 +114,7 @@ const Home = () => {
         </Grid>
       </Paper>
 
-      {/* نظام الهوايات اليومية الذكي */}
-      <Paper
-        elevation={6}
-        sx={{
-          p: 4,
-          borderRadius: 4,
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white',
-          mb: 6
-        }}
-      >
-        <Box textAlign="center" mb={4}>
-          <CalendarTodayIcon sx={{ fontSize: 60, mb: 2, color: '#fff' }} />
-          <Typography variant="h3" fontWeight="bold" gutterBottom>
-            🎯 نظام الهوايات اليومية الذكي
-          </Typography>
-          <Typography variant="h6" sx={{ opacity: 0.9 }}>
-            اكتشف 4 هوايات جديدة كل يوم من مجموعتنا المتنوعة!
-          </Typography>
-        </Box>
 
-        <Grid container spacing={4} alignItems="center">
-          <Grid item xs={12} md={6}>
-            <Box>
-              <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: '#FFD700' }}>
-                🔥 كيف يعمل النظام؟
-              </Typography>
-              
-              <Box sx={{ mb: 3 }}>
-                <Chip 
-                  label="📅 يومياً" 
-                  sx={{ mr: 1, mb: 1, bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }} 
-                />
-                <Chip 
-                  label="🎲 عشوائي" 
-                  sx={{ mr: 1, mb: 1, bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }} 
-                />
-                <Chip 
-                  label="🔄 متجدد" 
-                  sx={{ mr: 1, mb: 1, bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }} 
-                />
-              </Box>
-
-              <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.8 }}>
-                ✨ <strong>4 هوايات فريدة</strong> كل يوم من أصل 54 هواية
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.8 }}>
-                🚫 <strong>لا تكرار</strong> لمدة 14 يوم كامل
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.8 }}>
-                🔄 <strong>دورة جديدة</strong> كل أسبوعين بترتيب مختلف
-              </Typography>
-              <Typography variant="body1" sx={{ lineHeight: 1.8 }}>
-                📈 <strong>تقدم تدريجي</strong> لاكتشاف كل الهوايات
-              </Typography>
-            </Box>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Paper 
-              elevation={4}
-              sx={{ 
-                p: 3, 
-                borderRadius: 3,
-                background: 'rgba(255,255,255,0.95)',
-                color: 'text.primary'
-              }}
-            >
-              <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: '#667eea' }}>
-                📊 مثال على الدورة:
-              </Typography>
-              
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  🗓️ <strong>اليوم 1:</strong> حفظ القرآن، الرسم، الطبخ، القراءة
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  🗓️ <strong>اليوم 2:</strong> التصوير، الزراعة، الكتابة، الموسيقى
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  🗓️ <strong>اليوم 3:</strong> التطريز، البرمجة، التأمل، الرياضة
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
-                  ... وهكذا حتى تكتشف كل الـ 54 هواية!
-                </Typography>
-              </Box>
-
-              <Box textAlign="center" mt={3}>
-                <Button
-                  component={RouterLink}
-                  to="/dashboard"
-                  variant="contained"
-                  size="large"
-                  startIcon={<AutoAwesomeIcon />}
-                  sx={{
-                    bgcolor: '#667eea',
-                    '&:hover': { bgcolor: '#5a6fd8' },
-                    borderRadius: 3,
-                    px: 4,
-                    py: 1.5
-                  }}
-                >
-                  اكتشف هوايات اليوم
-                </Button>
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Paper>
 
       {/* Features Section */}
       <Typography variant="h4" component="h2" gutterBottom align="center" sx={{ mb: 4 }}>
