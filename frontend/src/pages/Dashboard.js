@@ -26,7 +26,6 @@ import CreateIcon from '@mui/icons-material/Create';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import RobotAssistant from '../components/RobotAssistant';
-import HobbySuggestion from '../components/HobbySuggestion';
 import DailyHobbies from '../components/DailyHobbies';
 import ConnectWithFriends from '../components/ConnectWithFriends';
 
@@ -183,10 +182,9 @@ const Dashboard = () => {
             </Paper>
           </Grid>
 
-          {/* Hobby Suggestion */}
+          {/* Daily Hobbies */}
           <Grid item xs={12} md={8}>
-            <HobbySuggestion 
-              mood={currentMood} 
+            <DailyHobbies 
               onHobbySelect={setCurrentHobbyForSharing}
             />
           </Grid>

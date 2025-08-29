@@ -27,7 +27,7 @@ const DailyHobbies = ({ onHobbySelect }) => {
     setError(null);
     
     try {
-      const response = await fetch('/api/hobbies/daily');
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'https://hobby-recommender-production.up.railway.app'}/api/hobbies/daily`);
       if (!response.ok) {
         throw new Error('Failed to fetch daily hobbies');
       }
