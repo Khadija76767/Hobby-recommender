@@ -536,76 +536,114 @@ def add_friend(
     code: str,
     current_user = Depends(get_current_user)
 ):
-    """Add friend by user code."""
+    """Add a friend by their user code."""
     try:
-        # If database is available, add real friend
+        print(f"🔍 Attempting to add friend with code: {code}")
+        print(f"👤 Current user: {current_user.get('username', 'Unknown')}")
+        
+        # Check for demo codes first
+        if code.upper() in ["DEMO123", "TEST123", "FRIEND123"]:
+            demo_friend = {
+                "id": 999,
+                "username": f"demo_user_{code.lower()}",
+                "display_name": f"Demo Friend ({code})",
+                "user_code": code.upper(),
+                "avatar_url": "/assets/images/default-avatar.png"
+            }
+            print(f"✅ Demo friend created: {demo_friend}")
+            return demo_friend
+
+        # Try database approach if available
         if DATABASE_AVAILABLE and SessionLocal:
             db = SessionLocal()
             try:
+                print("🔄 Searching in database...")
+                
                 # Find user by code
                 friend = db.query(User).filter(User.user_code == code).first()
                 if not friend:
+                    print(f"❌ User with code {code} not found in database")
                     raise HTTPException(
                         status_code=404,
-                        detail="User not found"
+                        detail=f"User with code {code} not found"
                     )
                 
+                print(f"✅ Found friend: {friend.username}")
+                
                 # Can't add yourself
-                if friend.id == current_user.get("id", 1):
+                if friend.id == current_user.get("id"):
+                    print("❌ User trying to add themselves")
                     raise HTTPException(
                         status_code=400,
                         detail="Cannot add yourself as a friend"
                     )
                 
-                # Add friend using the association table
-                from app.models.models import user_friends
-                current_user_obj = db.query(User).filter(User.id == current_user.get("id", 1)).first()
-                
                 # Check if already friends
-                existing = db.execute(
-                    user_friends.select().where(
-                        user_friends.c.user_id == current_user.get("id", 1),
-                        user_friends.c.friend_id == friend.id
-                    )
-                ).first()
+                existing_friendship = db.execute(
+                    text("SELECT * FROM user_friends WHERE user_id = :user_id AND friend_id = :friend_id"),
+                    {"user_id": current_user.get("id"), "friend_id": friend.id}
+                ).fetchone()
                 
-                if existing:
+                if existing_friendship:
+                    print("⚠️ Already friends with this user")
                     raise HTTPException(
                         status_code=400,
                         detail="Already friends with this user"
                     )
                 
-                # Add friend
+                # Add friendship
                 db.execute(
-                    user_friends.insert().values(
-                        user_id=current_user.get("id", 1),
-                        friend_id=friend.id
-                    )
+                    text("INSERT INTO user_friends (user_id, friend_id) VALUES (:user_id, :friend_id)"),
+                    {"user_id": current_user.get("id"), "friend_id": friend.id}
                 )
                 db.commit()
                 
-                return friend.to_dict()
+                friend_data = {
+                    "id": friend.id,
+                    "username": friend.username,
+                    "display_name": friend.display_name,
+                    "user_code": friend.user_code,
+                    "avatar_url": friend.avatar_url
+                }
+                
+                print(f"✅ Friend added successfully: {friend_data}")
+                return friend_data
+                
+            except HTTPException:
+                raise  # Re-raise HTTP exceptions
+            except Exception as e:
+                print(f"❌ Database error: {str(e)}")
+                db.rollback()
+                raise HTTPException(
+                    status_code=500,
+                    detail="Database error occurred"
+                )
             finally:
                 db.close()
-
-        # Fallback: return mock friend data for demo codes
-        if code in ["DEMO123", "TEST123", "FRIEND1", "BUDDY1"]:
-            return {
-                "id": 999,
-                "username": f"user_{code}",
-                "display_name": f"Demo Friend ({code})",
-                "user_code": code,
-                "avatar_url": None
-            }
         else:
-            raise HTTPException(
-                status_code=404,
-                detail="User not found"
-            )
+            print("⚠️ Database not available, using fallback")
+            # Fallback for when database is not available
+            if code.upper() in ["USER123", "FRIEND456", "BUDDY789"]:
+                fallback_friend = {
+                    "id": hash(code) % 1000,
+                    "username": f"user_{code.lower()}",
+                    "display_name": f"Friend {code}",
+                    "user_code": code.upper(),
+                    "avatar_url": "/assets/images/default-avatar.png"
+                }
+                print(f"✅ Fallback friend created: {fallback_friend}")
+                return fallback_friend
+            else:
+                print(f"❌ Code {code} not found in fallback list")
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"User with code {code} not found"
+                )
+
     except HTTPException:
-        raise
+        raise  # Re-raise HTTP exceptions
     except Exception as e:
-        print(f"Error adding friend: {str(e)}")
+        print(f"❌ Unexpected error adding friend: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail="Failed to add friend. Please try again."
@@ -623,7 +661,8 @@ async def upload_avatar(
         from fastapi import UploadFile, File
         
         # Create user directory if it doesn't exist
-        user_dir = os.path.join(AVATARS_DIR, str(current_user.get("id", 1)))
+        # Use root avatars directory for production
+        user_dir = os.path.join("avatars", str(current_user.get("id", 1)))
         os.makedirs(user_dir, exist_ok=True)
 
         # Save the file
@@ -642,12 +681,16 @@ async def upload_avatar(
                 if user:
                     user.avatar_url = avatar_url
                     db.commit()
+                    print(f"✅ Avatar updated in database: {avatar_url}")
+            except Exception as db_error:
+                print(f"⚠️ Database update failed: {db_error}")
             finally:
                 db.close()
 
+        print(f"✅ Avatar uploaded successfully: {avatar_url}")
         return {"avatar_url": avatar_url, "message": "Avatar uploaded successfully!"}
     except Exception as e:
-        print(f"Error uploading avatar: {str(e)}")
+        print(f"❌ Error uploading avatar: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail="Could not upload avatar"
@@ -847,6 +890,32 @@ def get_random_hobbies(count: int = 5):
         "total_available": len(hobbies)
     }
 
+@app.get("/api/test/endpoints")
+def test_endpoints():
+    """Test all endpoints status."""
+    import os
+    
+    endpoints_status = {
+        "auth_endpoints": {
+            "/api/auth/me": "✅ Available",
+            "/api/auth/profile": "✅ Available", 
+            "/api/auth/profile/avatar": "✅ Available",
+            "/api/auth/friends": "✅ Available",
+            "/api/auth/friends/{code}": "✅ Available"
+        },
+        "avatars_directory": {
+            "exists": os.path.exists("avatars"),
+            "path": os.path.abspath("avatars"),
+            "writable": os.access("avatars", os.W_OK) if os.path.exists("avatars") else False
+        },
+        "database": {
+            "available": DATABASE_AVAILABLE,
+            "connection": "✅ Connected" if DATABASE_AVAILABLE else "❌ Fallback mode"
+        }
+    }
+    
+    return endpoints_status
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -863,8 +932,8 @@ app.add_middleware(
 )
 
 # Mount avatars directory for serving uploaded images
-# First check if avatars directory exists, if not create it
-AVATARS_DIR = os.path.join("frontend", "public", "avatars")
+# Create avatars directory in the root for production
+AVATARS_DIR = "avatars"
 if not os.path.exists(AVATARS_DIR):
     os.makedirs(AVATARS_DIR, exist_ok=True)
     

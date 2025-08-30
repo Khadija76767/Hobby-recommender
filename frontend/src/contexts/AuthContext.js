@@ -227,13 +227,37 @@ export const AuthProvider = ({ children }) => {
     }, 100);
   };
 
-  // دالة لتحديث بيانات المستخدم بدون API calls
+  // دالة لتحديث بيانات المستخدم من API
   const updateUserData = async () => {
-    if (currentUser) {
-      console.log('✅ User data already available');
-      return currentUser;
+    if (!token) {
+      console.log('❌ No token available for user update');
+      return null;
     }
-    return null;
+
+    try {
+      console.log('🔄 Refreshing user data from API...');
+      const response = await api.get('/api/auth/me');
+      const userData = response.data;
+      
+      // تحديث البيانات في الـ state
+      setCurrentUser(userData);
+      
+      // حفظ البيانات المحدثة في localStorage
+      localStorage.setItem('userData', JSON.stringify(userData));
+      
+      console.log('✅ User data updated successfully:', userData);
+      return userData;
+    } catch (error) {
+      console.error('❌ Error updating user data:', error);
+      
+      // إذا كان الخطأ 401، فهذا يعني أن الـ token منتهي الصلاحية
+      if (error.response?.status === 401) {
+        console.log('🔑 Token expired, logging out...');
+        logout();
+      }
+      
+      return null;
+    }
   };
 
   const value = {
