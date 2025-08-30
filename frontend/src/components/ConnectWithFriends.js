@@ -1,34 +1,59 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Button,
-  Card,
-  Chip,
-  Grid,
-  IconButton,
   Paper,
   Typography,
-  Snackbar,
-  Alert,
+  Button,
   TextField,
+  Grid,
+  Card,
+  Chip,
+  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Snackbar,
+  Alert,
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import StarIcon from '@mui/icons-material/Star';
 import { useAuth } from '../contexts/AuthContext';
 
 const ConnectWithFriends = ({ currentHobby }) => {
-  const { currentUser, api } = useAuth();
+  const { api, currentUser } = useAuth();
   const [friends, setFriends] = useState([]);
-  const [sharedHobbies, setSharedHobbies] = useState([]);
-  const [notification, setNotification] = useState(null);
   const [friendCode, setFriendCode] = useState('');
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [notification, setNotification] = useState(null);
   const [friendToDelete, setFriendToDelete] = useState(null);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [dailyHobbies, setDailyHobbies] = useState([]); // 🔥 هوايات اليوم
+  const [sharedHobbies, setSharedHobbies] = useState([]);
+
+  // 🔥 جلب هوايات اليوم عند تحميل المكون
+  useEffect(() => {
+    fetchDailyHobbies();
+  }, []);
+
+  const fetchDailyHobbies = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/hobbies/daily`);
+      const data = await response.json();
+      setDailyHobbies(data.hobbies || []);
+      console.log('✅ Daily hobbies loaded:', data.hobbies);
+    } catch (error) {
+      console.error('❌ Error fetching daily hobbies:', error);
+    }
+  };
 
   // Load friends from API
   useEffect(() => {
@@ -109,20 +134,51 @@ const ConnectWithFriends = ({ currentHobby }) => {
     }
   };
 
-  const handleShare = async (friend) => {
-    const invitationMessage = `${currentUser.display_name} invites you to try ${currentHobby} together!`;
+  const handleShare = (friend) => {
+    setSelectedFriend(friend);
+    setShareDialogOpen(true);
+  };
 
-    const newSharedHobby = {
-      hobby: currentHobby,
-      friend: friend.name,
-      date: new Date(),
-    };
-    setSharedHobbies([...sharedHobbies, newSharedHobby]);
+  const shareHobbyWithFriend = async (hobby) => {
+    try {
+      // 🔥 إرسال الهواية للصديق عبر API
+      const shareData = {
+        hobby_name: hobby.name,
+        hobby_id: hobby.id,
+        message: `${currentUser?.display_name || currentUser?.username} يدعوك لتجربة "${hobby.name}" معاً! 🎯✨`
+      };
 
-    setNotification({
-      type: 'success',
-      message: `Shared ${currentHobby} with ${friend.name}! 💌`,
-    });
+      const response = await api.post(`/api/auth/friends/${selectedFriend.id}/share`, shareData);
+      console.log('📤 Share API response:', response.data);
+
+      // إضافة للهوايات المشاركة محلياً
+      const newSharedHobby = {
+        hobby: hobby.name,
+        hobbyId: hobby.id,
+        friend: selectedFriend.name,
+        friendId: selectedFriend.id,
+        date: new Date(),
+        sharedBy: currentUser?.display_name || currentUser?.username || 'You',
+        shareId: response.data.share_id
+      };
+      
+      setSharedHobbies(prev => [...prev, newSharedHobby]);
+
+      setNotification({
+        type: 'success',
+        message: `✨ تم إرسال "${hobby.name}" لـ ${selectedFriend.name}! 🎉`,
+      });
+
+    } catch (error) {
+      console.error('❌ Error sharing hobby:', error);
+      setNotification({
+        type: 'error',
+        message: 'فشل في إرسال الهواية. يرجى المحاولة مرة أخرى.',
+      });
+    }
+
+    setShareDialogOpen(false);
+    setSelectedFriend(null);
   };
 
   const handleRemoveFriend = (friend) => {
@@ -299,43 +355,80 @@ const ConnectWithFriends = ({ currentHobby }) => {
           </Paper>
         </Grid>
 
-        {/* Shared Hobbies */}
+        {/* Shared Hobbies Section */}
         <Grid item xs={12} md={4}>
           <Paper
             elevation={3}
             sx={{
               p: 3,
               borderRadius: 4,
-              background: 'linear-gradient(135deg, #E8F5FF 0%, #FFF4F9 100%)',
-              height: '100%',
+              background: 'linear-gradient(135deg, #E8F5FF 0%, #F0E8FF 100%)',
             }}
           >
             <Typography
-              variant="h6"
+              variant="h5"
               gutterBottom
-              fontFamily="Patrick Hand"
-              sx={{ color: '#4A4A4A', mb: 2 }}
+              sx={{
+                fontFamily: 'Patrick Hand',
+                color: '#4A4A4A',
+                textAlign: 'center',
+                mb: 3,
+              }}
             >
-              Shared Moments ✨
+              💫 اللحظات المشاركة
             </Typography>
-            {sharedHobbies.map((share, index) => (
-              <Box
-                key={index}
-                sx={{
-                  mb: 2,
-                  p: 2,
-                  bgcolor: 'rgba(255, 255, 255, 0.9)',
-                  borderRadius: 2,
-                }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  You and {share.friend} both like
-                </Typography>
-                <Typography variant="body1" fontWeight="medium">
-                  {share.hobby} 🎨
+
+            {sharedHobbies.length > 0 ? (
+              <Box sx={{ maxHeight: '400px', overflowY: 'auto' }}>
+                {sharedHobbies.map((shared, index) => (
+                  <Card
+                    key={index}
+                    sx={{
+                      p: 2,
+                      mb: 2,
+                      background: 'rgba(255, 255, 255, 0.9)',
+                      borderLeft: '4px solid #FFB5E8',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <StarIcon sx={{ color: '#FFD700', fontSize: 18 }} />
+                      <Typography 
+                        variant="subtitle2" 
+                        sx={{ fontWeight: 'bold', color: '#4A4A4A' }}
+                      >
+                        {shared.hobby}
+                      </Typography>
+                    </Box>
+                    
+                    <Typography 
+                      variant="body2" 
+                      sx={{ color: '#666', mb: 1 }}
+                    >
+                      مشاركة مع {shared.friend}
+                    </Typography>
+                    
+                    <Typography 
+                      variant="caption" 
+                      sx={{ color: '#999' }}
+                    >
+                      {new Date(shared.date).toLocaleDateString('ar-SA')}
+                    </Typography>
+                  </Card>
+                ))}
+              </Box>
+            ) : (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary"
+                  sx={{ fontFamily: 'Patrick Hand' }}
+                >
+                  لم تشارك أي هوايات بعد ✨
+                  <br />
+                  ابدأ بمشاركة هواية مع أصدقائك! 🎯
                 </Typography>
               </Box>
-            ))}
+            )}
           </Paper>
         </Grid>
       </Grid>
@@ -374,6 +467,100 @@ const ConnectWithFriends = ({ currentHobby }) => {
             }}
           >
             Remove Friend
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Share Hobby Dialog */}
+      <Dialog 
+        open={shareDialogOpen} 
+        onClose={() => setShareDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ 
+          textAlign: 'center', 
+          bgcolor: 'linear-gradient(135deg, #FFB5E8 0%, #FF8CC8 100%)',
+          color: 'white',
+          fontFamily: 'Patrick Hand'
+        }}>
+          ✨ مشاركة هواية مع {selectedFriend?.name}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Typography 
+            variant="body1" 
+            align="center" 
+            sx={{ mb: 3, color: '#666', fontFamily: 'Patrick Hand' }}
+          >
+            اختر هواية من هوايات اليوم لتشاركها 🎯
+          </Typography>
+          
+          <Grid container spacing={2}>
+            {dailyHobbies.map((hobby, index) => (
+              <Grid item xs={12} key={hobby.id}>
+                <Card
+                  onClick={() => shareHobbyWithFriend(hobby)}
+                  sx={{
+                    p: 2,
+                    cursor: 'pointer',
+                    background: `linear-gradient(135deg, ${
+                      index % 2 === 0 ? '#FFE8F5, #FFF4E8' : '#E8F5FF, #F0E8FF'
+                    })`,
+                    border: '2px solid transparent',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      border: '2px solid #FFB5E8',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 4px 12px rgba(255, 181, 232, 0.3)',
+                    }
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    {index % 2 === 0 ? (
+                      <FavoriteIcon sx={{ color: '#FF69B4', fontSize: 24 }} />
+                    ) : (
+                      <StarIcon sx={{ color: '#FFD700', fontSize: 24 }} />
+                    )}
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography 
+                        variant="h6" 
+                        sx={{ fontFamily: 'Patrick Hand', color: '#4A4A4A' }}
+                      >
+                        {hobby.name}
+                      </Typography>
+                      <Typography 
+                        variant="body2" 
+                        sx={{ color: '#666', fontSize: '0.9rem' }}
+                      >
+                        {hobby.description.substring(0, 60)}...
+                      </Typography>
+                    </Box>
+                    <ShareIcon sx={{ color: '#4A4A4A', opacity: 0.7 }} />
+                  </Box>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          {dailyHobbies.length === 0 && (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography color="text.secondary">
+                لا توجد هوايات متاحة اليوم 🤔
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 3, justifyContent: 'center' }}>
+          <Button 
+            onClick={() => setShareDialogOpen(false)}
+            sx={{ 
+              color: '#666',
+              fontFamily: 'Patrick Hand',
+              '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' }
+            }}
+          >
+            إلغاء
           </Button>
         </DialogActions>
       </Dialog>

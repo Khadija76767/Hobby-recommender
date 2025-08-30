@@ -9,6 +9,7 @@ import secrets
 import string
 from datetime import datetime, timedelta
 from typing import Optional
+import time
 
 app = FastAPI(
     title="AI Hobby Recommender",
@@ -649,6 +650,54 @@ def add_friend(
             detail="Failed to add friend. Please try again."
         )
 
+@app.delete("/api/auth/friends/{friend_id}")
+def remove_friend(
+    friend_id: int,
+    current_user = Depends(get_current_user)
+):
+    """Remove a friend by their ID."""
+    try:
+        print(f"🗑️ Attempting to remove friend {friend_id} for user {current_user.get('username', 'Unknown')}")
+        
+        # Try database approach if available
+        if DATABASE_AVAILABLE and SessionLocal:
+            db = SessionLocal()
+            try:
+                print("🔄 Removing from database...")
+                
+                # Remove friendship (both directions)
+                db.execute(
+                    text("DELETE FROM user_friends WHERE (user_id = :user_id AND friend_id = :friend_id) OR (user_id = :friend_id AND friend_id = :user_id)"),
+                    {"user_id": current_user.get("id"), "friend_id": friend_id}
+                )
+                db.commit()
+                
+                print(f"✅ Friend {friend_id} removed successfully")
+                return {"message": "Friend removed successfully"}
+                
+            except Exception as e:
+                print(f"❌ Database error: {str(e)}")
+                db.rollback()
+                raise HTTPException(
+                    status_code=500,
+                    detail="Database error occurred"
+                )
+            finally:
+                db.close()
+        else:
+            print("⚠️ Database not available, simulating removal")
+            # Fallback - just return success (since it's demo mode)
+            return {"message": "Friend removed successfully (demo mode)"}
+
+    except HTTPException:
+        raise  # Re-raise HTTP exceptions
+    except Exception as e:
+        print(f"❌ Unexpected error removing friend: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to remove friend. Please try again."
+        )
+
 @app.post("/api/auth/profile/avatar")
 async def upload_avatar(
     file: UploadFile = File(...),
@@ -694,6 +743,50 @@ async def upload_avatar(
         raise HTTPException(
             status_code=500,
             detail="Could not upload avatar"
+        )
+
+@app.post("/api/auth/friends/{friend_id}/share")
+def share_hobby_with_friend(
+    friend_id: int,
+    hobby_data: dict,
+    current_user = Depends(get_current_user)
+):
+    """Share a hobby with a friend."""
+    try:
+        hobby_name = hobby_data.get("hobby_name", "Unknown Hobby")
+        hobby_id = hobby_data.get("hobby_id", 0)
+        message = hobby_data.get("message", "")
+        
+        print(f"📤 Sharing '{hobby_name}' from user {current_user.get('username')} to friend {friend_id}")
+        
+        # Here you could store the shared hobby in database
+        # For now, we'll just return a success response
+        
+        share_notification = {
+            "id": f"share_{current_user.get('id')}_{friend_id}_{hobby_id}_{int(time.time())}",
+            "from_user_id": current_user.get("id"),
+            "from_user_name": current_user.get("display_name") or current_user.get("username"),
+            "to_user_id": friend_id,
+            "hobby_name": hobby_name,
+            "hobby_id": hobby_id,
+            "message": message,
+            "shared_at": time.time(),
+            "type": "hobby_share"
+        }
+        
+        print(f"✅ Hobby share notification created: {share_notification}")
+        
+        return {
+            "message": "Hobby shared successfully!",
+            "share_id": share_notification["id"],
+            "notification": share_notification
+        }
+        
+    except Exception as e:
+        print(f"❌ Error sharing hobby: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to share hobby. Please try again."
         )
 
 # اختبار قاعدة البيانات
