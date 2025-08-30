@@ -103,31 +103,88 @@ const RobotAssistant = ({ onMoodChange }) => {
     };
   }, []);
 
-  // 🔥 تحديث البيانات عند تغيير المستخدم
+  // 🔥 تحديث البيانات عند تغيير المستخدم أو البروفايل
   useEffect(() => {
     if (currentUser) {
       const userKey = `userName_user_${currentUser.id}`;
-      const savedName = localStorage.getItem(userKey);
       
-      if (savedName) {
-        setUserName(savedName);
+      // 🔥 إعطاء أولوية للاسم من البروفايل (display_name) دائماً
+      const profileName = currentUser.display_name || currentUser.username;
+      
+      if (profileName) {
+        // استخدم الاسم من البروفايل مباشرة
+        setUserName(profileName);
+        localStorage.setItem(userKey, profileName); // احفظه للمرة القادمة
         setShowNameInput(false);
-      } else if (currentUser.display_name || currentUser.username) {
-        // استخدم اسم المستخدم من البروفايل إذا متوفر
-        const defaultName = currentUser.display_name || currentUser.username;
-        setUserName(defaultName);
-        localStorage.setItem(userKey, defaultName); // احفظه للمرة القادمة
-        setShowNameInput(false);
+        console.log(`🏷️ Updated user name from profile: ${profileName}`);
       } else {
-        // اطلب من المستخدم إدخال اسم
-        setUserName('');
-        setShowNameInput(true);
+        // إذا لم يكن هناك اسم في البروفايل، تحقق من localStorage
+        const savedName = localStorage.getItem(userKey);
+        if (savedName) {
+          setUserName(savedName);
+          setShowNameInput(false);
+          console.log(`🏷️ Loaded saved name: ${savedName}`);
+        } else {
+          // اطلب من المستخدم إدخال اسم
+          setUserName('');
+          setShowNameInput(true);
+          console.log('🏷️ No name found, requesting input');
+        }
       }
     } else {
       setUserName('');
       setShowNameInput(false);
     }
-  }, [currentUser]);
+  }, [currentUser, currentUser?.display_name]); // 🔥 مراقبة display_name أيضاً
+
+  // 🔥 مراقبة تغيير display_name تحديداً (للتحديث الفوري)
+  useEffect(() => {
+    if (currentUser && currentUser.display_name) {
+      const currentDisplayName = currentUser.display_name;
+      
+      // إذا تغير display_name عن الاسم المحفوظ، حديثه
+      if (currentDisplayName !== userName && currentDisplayName.trim() !== '') {
+        setUserName(currentDisplayName);
+        
+        // حفظ الاسم الجديد
+        const userKey = `userName_user_${currentUser.id}`;
+        localStorage.setItem(userKey, currentDisplayName);
+        
+        console.log(`🔄 Display name changed, updated to: ${currentDisplayName}`);
+      }
+    }
+  }, [currentUser?.display_name]); // مراقبة display_name فقط
+
+  // 🔥 مراقبة تغيير localStorage (عند تحديث البروفايل من مكان آخر)
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === 'userData' && currentUser) {
+        try {
+          const updatedUserData = JSON.parse(event.newValue);
+          if (updatedUserData && updatedUserData.id === currentUser.id) {
+            const newDisplayName = updatedUserData.display_name || updatedUserData.username;
+            if (newDisplayName && newDisplayName !== userName) {
+              setUserName(newDisplayName);
+              
+              // تحديث localStorage أيضاً لـ RobotAssistant
+              const userKey = `userName_user_${currentUser.id}`;
+              localStorage.setItem(userKey, newDisplayName);
+              
+              console.log(`🔄 Name updated from storage change: ${newDisplayName}`);
+            }
+          }
+        } catch (error) {
+          console.error('Error parsing storage change:', error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [currentUser, userName]);
 
   const handleSpeak = async (text) => {
     setSpeaking(true);

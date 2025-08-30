@@ -94,9 +94,22 @@ const UserProfile = () => {
         display_name: profile.display_name,
       });
 
-      // Update context after successful save
+      // 🔥 تحديث currentUser مباشرة بالاسم الجديد
+      if (setCurrentUser && currentUser) {
+        const updatedUser = {
+          ...currentUser,
+          display_name: profile.display_name
+        };
+        setCurrentUser(updatedUser);
+        
+        // حفظ في localStorage أيضاً
+        localStorage.setItem('userData', JSON.stringify(updatedUser));
+        console.log('✅ Updated currentUser with new display_name:', updatedUser);
+      }
+
+      // Update context after successful save (optional - for API sync)
       if (updateUserData) {
-        await updateUserData();
+        setTimeout(() => updateUserData(), 500); // تأخير قصير للتأكد من التحديث
       }
 
       setIsEditing(false);
