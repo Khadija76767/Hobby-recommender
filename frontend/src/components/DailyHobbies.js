@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { Refresh, Info as InfoIcon, CalendarToday } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import HobbyDetailModal from './HobbyDetailModal';
 
 const DailyHobbies = ({ onHobbySelect }) => {
   const [dailyHobbies, setDailyHobbies] = useState([]);
@@ -20,6 +21,8 @@ const DailyHobbies = ({ onHobbySelect }) => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedHobby, setSelectedHobby] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const { api } = useAuth();
 
   const fetchDailyHobbies = async () => {
@@ -71,6 +74,16 @@ const DailyHobbies = ({ onHobbySelect }) => {
     if (onHobbySelect) {
       onHobbySelect(hobby.name);
     }
+  };
+
+  const handleOpenModal = (hobby) => {
+    setSelectedHobby(hobby);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedHobby(null);
   };
 
   if (loading) {
@@ -240,7 +253,7 @@ const DailyHobbies = ({ onHobbySelect }) => {
                   boxShadow: 4
                 }
               }}
-              onClick={() => handleHobbySelect(hobby)}
+                                onClick={() => handleOpenModal(hobby)}
             >
               <CardContent>
                 <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
@@ -275,6 +288,7 @@ const DailyHobbies = ({ onHobbySelect }) => {
                   startIcon={<InfoIcon />}
                   fullWidth
                   sx={{ mt: 1 }}
+                  onClick={() => handleOpenModal(hobby)}
                 >
                   ابدأ الآن
                 </Button>
@@ -302,6 +316,13 @@ const DailyHobbies = ({ onHobbySelect }) => {
           • ارجع غداً لاكتشاف 4 هوايات جديدة! 🎊
         </Typography>
       </Paper>
+
+      {/* Modal تفاصيل الهواية */}
+      <HobbyDetailModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        hobby={selectedHobby}
+      />
     </Box>
   );
 };
