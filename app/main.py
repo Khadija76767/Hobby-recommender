@@ -112,7 +112,10 @@ def get_password_hash(password):
 
 def generate_user_code():
     """توليد كود مستخدم فريد"""
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    # 🔥 إضافة timestamp لضمان الفرادة
+    timestamp_part = str(int(time.time()))[-3:]  # آخر 3 أرقام من timestamp
+    random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=3))
+    return random_part + timestamp_part
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     if not DATABASE_AVAILABLE or not jwt:
@@ -246,12 +249,13 @@ def register(user_data: dict):
         
         # تحقق بسيط
         if not username or not email or not password:
+            unique_id = hash(f"{username}_{email}_{time.time()}") % 100000
             return {
                 "message": "تم التسجيل بنجاح (بيانات مكملة تلقائياً)!",
                 "user": {
                     "username": username or "user_" + generate_user_code()[:3],
                     "email": email or f"user_{generate_user_code()[:3]}@example.com",
-                    "id": 1,
+                    "id": unique_id,
                     "user_code": generate_user_code(),
                     "display_name": username or "مستخدم جديد"
                 },
@@ -313,12 +317,13 @@ def register(user_data: dict):
                 pass
         
         # النظام البسيط (always works)
+        simple_id = hash(f"{username}_{email}_{time.time()}") % 100000
         return {
             "message": "🎉 تم التسجيل بنجاح!",
             "user": {
                 "username": username,
                 "email": email,
-                "id": 1,
+                "id": simple_id,
                 "user_code": generate_user_code(),
                 "display_name": username
             },
@@ -328,13 +333,15 @@ def register(user_data: dict):
     except Exception as e:
         print(f"Registration error: {e}")
         # emergency fallback
+        emergency_id = hash(f"emergency_{time.time()}") % 100000
+        emergency_code = generate_user_code()
         return {
             "message": "تم التسجيل بنجاح (نظام الطوارئ)!",
             "user": {
-                "username": "user_" + generate_user_code()[:4],
-                "email": f"user_{generate_user_code()[:4]}@example.com",
-                "id": 1,
-                "user_code": generate_user_code(),
+                "username": "user_" + emergency_code[:4],
+                "email": f"user_{emergency_code[:4]}@example.com",
+                "id": emergency_id,
+                "user_code": emergency_code,
                 "display_name": "مستخدم جديد"
             },
             "access_token": "emergency_token"
@@ -1008,6 +1015,45 @@ def test_endpoints():
     }
     
     return endpoints_status
+
+@app.get("/api/debug/user-codes")
+def debug_user_codes():
+    """Debug endpoint to check user codes uniqueness."""
+    try:
+        if DATABASE_AVAILABLE and SessionLocal:
+            db = SessionLocal()
+            try:
+                users = db.query(User).all()
+                user_codes = []
+                for user in users:
+                    user_codes.append({
+                        "id": user.id,
+                        "username": user.username,
+                        "user_code": user.user_code
+                    })
+                
+                # فحص التكرار
+                all_codes = [u["user_code"] for u in user_codes]
+                duplicates = []
+                for code in set(all_codes):
+                    if all_codes.count(code) > 1:
+                        duplicates.append(code)
+                
+                return {
+                    "total_users": len(user_codes),
+                    "user_codes": user_codes,
+                    "duplicates": duplicates,
+                    "unique_codes": len(set(all_codes))
+                }
+            finally:
+                db.close()
+        else:
+            return {
+                "message": "Database not available - codes generated randomly",
+                "test_codes": [generate_user_code() for _ in range(5)]
+            }
+    except Exception as e:
+        return {"error": str(e)}
 
 # Configure CORS
 app.add_middleware(
