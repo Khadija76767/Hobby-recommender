@@ -372,6 +372,494 @@ const HobbyDetailModal = ({ open, onClose, hobby }) => {
           'سجل نفسك وأنت تعزف لتتبع التقدم'
         ]
       };
+    } else if (hobbyName.includes('رسالة للذات') || hobbyName.includes('رسالة لنفسك')) {
+      return {
+        benefits: [
+          'تطوير الوعي الذاتي والتأمل',
+          'تحديد الأهداف والأحلام بوضوح',
+          'تحفيز الذات للتطوير المستمر',
+          'توثيق اللحظة الحالية للمستقبل',
+          'تعزيز الثقة بالنفس والطموح'
+        ],
+        requirements: ['ورق أو دفتر', 'قلم', 'مكان هادئ للتأمل', 'صدق مع النفس'],
+        apps: [
+          { name: 'Journey', description: 'تطبيق يوميات رقمي جميل ومنظم' },
+          { name: 'Day One', description: 'تطبيق كتابة يوميات مع صور' },
+          { name: 'Future Me', description: 'إرسال رسائل لنفسك في المستقبل' },
+          { name: 'Time Capsule', description: 'كبسولة زمنية رقمية للذكريات' }
+        ],
+        websites: [
+          { name: 'FutureMe', url: 'futureme.org', description: 'إرسال رسائل إلكترونية للمستقبل' },
+          { name: 'Letter to Future Self', url: 'letterfuture.com', description: 'منصة لكتابة رسائل المستقبل' }
+        ],
+        tips: [
+          'اكتب عن أحلامك وأهدافك الحالية',
+          'شارك مشاعرك الصادقة في هذه اللحظة',
+          'اسأل نفسك المستقبلية أسئلة مهمة',
+          'ضع الرسالة في مكان آمن للمستقبل',
+          'حدد تاريخ لفتح الرسالة'
+        ]
+      };
+    } else if (hobbyName.includes('فيديو ثانية') || hobbyName.includes('1 Second')) {
+      return {
+        benefits: [
+          'توثيق الحياة اليومية بطريقة إبداعية',
+          'تطوير مهارات التصوير والمونتاج',
+          'خلق ذكريات جميلة للمراجعة',
+          'تحسين الملاحظة للتفاصيل',
+          'مشاركة اللحظات مع الأحباب'
+        ],
+        requirements: ['جوال بكاميرا', 'تطبيق تصوير', 'إبداع في اختيار اللحظات'],
+        apps: [
+          { name: '1 Second Everyday', description: 'التطبيق الأصلي لفيديو الثانية الواحدة' },
+          { name: 'Hyperlapse', description: 'فيديوهات سريعة من Instagram' },
+          { name: 'Splice', description: 'تحرير فيديو بسيط ومجاني' },
+          { name: 'InShot', description: 'محرر فيديو شامل للجوال' }
+        ],
+        websites: [
+          { name: '1SE Community', url: '1se.co', description: 'مجتمع مستخدمي التطبيق' },
+          { name: 'Video Editing Tips', url: 'youtube.com', description: 'نصائح تحرير الفيديو' }
+        ],
+        tips: [
+          'صور ثانية واحدة كل ساعة أو عند الأحداث المهمة',
+          'نوع في زوايا التصوير والمواضيع',
+          'استخدم الإضاءة الطبيعية قدر الإمكان',
+          'اجمع الفيديوهات في نهاية الشهر',
+          'شارك الفيديو النهائي مع الأصدقاء'
+        ]
+      };
+    } else if (hobbyName.includes('لوحة أحلام') || hobbyName.includes('Pinterest') || hobbyName.includes('Canva')) {
+      return {
+        benefits: [
+          'تصور الأهداف والأحلام بصرياً',
+          'تحفيز اللاوعي لتحقيق الأحلام',
+          'تطوير الذوق الفني والتصميمي',
+          'تنظيم الأفكار والخطط',
+          'الإلهام المستمر والتحفيز'
+        ],
+        requirements: ['جوال أو كمبيوتر', 'اتصال إنترنت', 'رؤية واضحة للأهداف'],
+        apps: [
+          { name: 'Pinterest', description: 'أفضل تطبيق لإنشاء لوحات الأحلام' },
+          { name: 'Canva', description: 'تصميم لوحات أحلام احترافية' },
+          { name: 'Vision Board', description: 'تطبيق مخصص للوحات الأحلام' },
+          { name: 'DreamItAlive', description: 'لوحة أحلام تفاعلية' }
+        ],
+        websites: [
+          { name: 'Pinterest', url: 'pinterest.com', description: 'منصة الصور والأفكار الأشهر' },
+          { name: 'Canva', url: 'canva.com', description: 'أداة تصميم مجانية' },
+          { name: 'Vision Board Ideas', url: 'visionboardideas.com', description: 'أفكار للوحات الأحلام' }
+        ],
+        tips: [
+          'اختر 10 صور تمثل أحلامك الحقيقية',
+          'نظم الصور في فئات (عمل، سفر، صحة)',
+          'استخدم ألوان تحفزك وتسعدك',
+          'راجع لوحة أحلامك يومياً',
+          'حديث اللوحة كلما تطورت أحلامك'
+        ]
+      };
+    } else if (hobbyName.includes('نحت الصابون')) {
+      return {
+        benefits: [
+          'تطوير المهارات الحركية الدقيقة',
+          'الاسترخاء وتقليل التوتر',
+          'إنتاج قطع فنية مفيدة',
+          'تحسين التركيز والصبر',
+          'استخدام مواد بسيطة ومتاحة'
+        ],
+        requirements: ['قطع صابون', 'سكين بلاستيك أو أدوات نحت', 'منشفة', 'صبر وتركيز'],
+        apps: [
+          { name: 'Sculpting Techniques', description: 'تقنيات النحت للمبتدئين' },
+          { name: 'Soap Carving Guide', description: 'دليل نحت الصابون خطوة بخطوة' },
+          { name: 'Art Tutorials', description: 'دروس فنية متنوعة' }
+        ],
+        websites: [
+          { name: 'Soap Carving Tutorial', url: 'youtube.com', description: 'فيديوهات تعليمية مجانية' },
+          { name: 'Craft Ideas', url: 'craftideas.com', description: 'أفكار حرفية إبداعية' }
+        ],
+        tips: [
+          'ابدأ بأشكال بسيطة مثل القلب والنجمة',
+          'استخدم صابون طري وليس صلب جداً',
+          'اعمل ببطء وحذر لتجنب الكسر',
+          'احتفظ بالقطع المنحوتة كهدايا',
+          'تدرب على قطع صغيرة أولاً'
+        ]
+      };
+    } else if (hobbyName.includes('برطمان الذكريات') || hobbyName.includes('ذكريات يومية')) {
+      return {
+        benefits: [
+          'الاحتفاظ بالذكريات الجميلة',
+          'تطوير عادة التفكير الإيجابي',
+          'تحسين الصحة النفسية',
+          'توثيق رحلة الحياة',
+          'مراجعة الإنجازات والنمو'
+        ],
+        requirements: ['برطمان زجاجي', 'ورق ملون', 'قلم', 'شرائط للتزيين'],
+        apps: [
+          { name: 'Memory Jar', description: 'برطمان ذكريات رقمي' },
+          { name: 'Gratitude Journal', description: 'يوميات الامتنان والذكريات' },
+          { name: 'Day One', description: 'تطبيق يوميات شامل' },
+          { name: 'Journey', description: 'كتابة وحفظ الذكريات' }
+        ],
+        websites: [
+          { name: 'Memory Keeping Ideas', url: 'memorykeeping.com', description: 'أفكار لحفظ الذكريات' },
+          { name: 'DIY Memory Jar', url: 'diyprojects.com', description: 'صنع برطمان الذكريات' }
+        ],
+        tips: [
+          'اكتب 5 أشياء جميلة حدثت كل يوم',
+          'استخدم ورق ملون مختلف للمناسبات',
+          'زين البرطمان بطريقة تسعدك',
+          'اقرأ الذكريات في نهاية الشهر',
+          'اجعل الكتابة عادة يومية'
+        ]
+      };
+    } else if (hobbyName.includes('تذوق الشاي') || hobbyName.includes('أنواع الشاي')) {
+      return {
+        benefits: [
+          'تطوير حاسة التذوق والاستمتاع',
+          'الاسترخاء وتقليل التوتر',
+          'تعلم ثقافات مختلفة',
+          'تحسين عملية الهضم',
+          'اكتشاف نكهات وروائح جديدة'
+        ],
+        requirements: ['أنواع شاي مختلفة', 'كؤوس للتذوق', 'ماء ساخن', 'دفتر ملاحظات'],
+        apps: [
+          { name: 'Tea Tasting Notes', description: 'تطبيق لتسجيل ملاحظات تذوق الشاي' },
+          { name: 'Tea Timer', description: 'مؤقت لأوقات النقع المثالية' },
+          { name: 'World of Tea', description: 'دليل شامل لأنواع الشاي' },
+          { name: 'Tea Journey', description: 'تتبع رحلة تذوق الشاي' }
+        ],
+        websites: [
+          { name: 'Tea Association', url: 'teaassociation.org', description: 'معلومات شاملة عن الشاي' },
+          { name: 'Tea Tasting Guide', url: 'teaguide.com', description: 'دليل تذوق الشاي' },
+          { name: 'العالم العربي للشاي', url: 'arabtea.com', description: 'موقع عربي متخصص' }
+        ],
+        tips: [
+          'ابدأ بثلاثة أنواع مختلفة',
+          'اشرب الشاي بدون سكر للتذوق الحقيقي',
+          'سجل اللون والرائحة والطعم',
+          'جرب أوقات نقع مختلفة',
+          'قارن بين الأنواع في نفس الجلسة'
+        ]
+      };
+    } else if (hobbyName.includes('رسم على أكياس الشاي')) {
+      return {
+        benefits: [
+          'إعادة تدوير إبداعية للمواد',
+          'تطوير مهارات الرسم المصغر',
+          'إنتاج قطع فنية فريدة',
+          'تحسين الدقة والتركيز',
+          'الاستمتاع بفن بسيط ومميز'
+        ],
+        requirements: ['أكياس شاي مستعملة', 'أقلام رسم دقيقة', 'ألوان مائية', 'مجفف شعر'],
+        apps: [
+          { name: 'Miniature Art', description: 'دروس الرسم المصغر' },
+          { name: 'Tea Bag Art Gallery', description: 'معرض لفن أكياس الشاي' },
+          { name: 'Upcycling Ideas', description: 'أفكار إعادة التدوير الإبداعي' },
+          { name: 'Watercolor Techniques', description: 'تقنيات الألوان المائية' }
+        ],
+        websites: [
+          { name: 'Tea Bag Art', url: 'teabagart.com', description: 'مجتمع فناني أكياس الشاي' },
+          { name: 'Miniature Painting', url: 'minipainting.com', description: 'تقنيات الرسم المصغر' },
+          { name: 'Upcycling Art', url: 'upcyclingart.org', description: 'فن إعادة التدوير' }
+        ],
+        tips: [
+          'جفف أكياس الشاي جيداً قبل الرسم',
+          'استخدم أقلام دقيقة للتفاصيل',
+          'ابدأ برسومات بسيطة',
+          'استخدم ألوان مائية خفيفة',
+          'اتركها تجف تماماً قبل اللمس'
+        ]
+      };
+    } else if (hobbyName.includes('صناعة شموع') || hobbyName.includes('شموع من البقايا')) {
+      return {
+        benefits: [
+          'إعادة تدوير مفيدة واقتصادية',
+          'إنتاج شموع مخصصة بروائح مفضلة',
+          'تطوير مهارات حرفية جديدة',
+          'خلق أجواء مريحة في المنزل',
+          'صنع هدايا شخصية مميزة'
+        ],
+        requirements: ['بقايا شموع', 'قوالب أو أكواب', 'فتائل جديدة', 'زيوت عطرية (اختياري)'],
+        apps: [
+          { name: 'Candle Making Guide', description: 'دليل شامل لصناعة الشموع' },
+          { name: 'Fragrance Calculator', description: 'حساب كمية العطور المطلوبة' },
+          { name: 'DIY Crafts', description: 'أفكار حرفية منزلية' },
+          { name: 'Candle Timer', description: 'تتبع أوقات الذوبان والتجمد' }
+        ],
+        websites: [
+          { name: 'Candle Making Supplies', url: 'candlemaking.com', description: 'مستلزمات صناعة الشموع' },
+          { name: 'DIY Candles', url: 'diycandles.org', description: 'دروس صناعة الشموع' },
+          { name: 'صناعة الشموع', url: 'shamoo3.com', description: 'موقع عربي متخصص' }
+        ],
+        tips: [
+          'اذب الشموع في حمام مائي لتجنب الحرق',
+          'أضف العطر عندما يبرد الشمع قليلاً',
+          'ثبت الفتيل في وسط القالب',
+          'اتركها تبرد ببطء للحصول على سطح أملس',
+          'قص الفتيل لطول مناسب قبل الإشعال'
+        ]
+      };
+    } else if (hobbyName.includes('تلوين تأملي') || hobbyName.includes('ماندالا')) {
+      return {
+        benefits: [
+          'تقليل التوتر والقلق بشكل كبير',
+          'تحسين التركيز والانتباه',
+          'تطوير الصبر والهدوء الداخلي',
+          'تحفيز الإبداع والخيال',
+          'ممارسة نوع من التأمل النشط'
+        ],
+        requirements: ['كتب تلوين أو أوراق ماندالا', 'أقلام ملونة', 'موسيقى هادئة', 'مكان مريح'],
+        apps: [
+          { name: 'Colorfy', description: 'تطبيق تلوين رقمي للكبار' },
+          { name: 'Mandala Coloring', description: 'تلوين ماندالا رقمي' },
+          { name: 'Adult Coloring Book', description: 'كتاب تلوين رقمي شامل' },
+          { name: 'Zen Coloring', description: 'تلوين تأملي مع موسيقى' }
+        ],
+        websites: [
+          { name: 'Free Mandala', url: 'freemandala.com', description: 'ماندالا مجانية للطباعة' },
+          { name: 'Coloring Pages', url: 'coloringpages.com', description: 'صفحات تلوين متنوعة' },
+          { name: 'تلوين عربي', url: 'coloring-ar.com', description: 'صفحات تلوين عربية' }
+        ],
+        tips: [
+          'اختر وقت هادئ بدون مقاطعات',
+          'شغل موسيقى هادئة في الخلفية',
+          'لا تقلق من النتيجة النهائية',
+          'ركز على عملية التلوين وليس النتيجة',
+          'تنفس بعمق أثناء التلوين'
+        ]
+      };
+    } else if (hobbyName.includes('يوميات الامتنان') || hobbyName.includes('امتنان')) {
+      return {
+        benefits: [
+          'تحسين الصحة النفسية والسعادة',
+          'تطوير نظرة إيجابية للحياة',
+          'تقليل التوتر والاكتئاب',
+          'تعزيز الشعور بالرضا',
+          'تقوية العلاقات الاجتماعية'
+        ],
+        requirements: ['دفتر صغير', 'قلم', '5 دقائق يومياً', 'تركيز على الأشياء الإيجابية'],
+        apps: [
+          { name: 'Gratitude Journal', description: 'تطبيق يوميات الامتنان المتخصص' },
+          { name: 'Five Minute Journal', description: 'يوميات الخمس دقائق' },
+          { name: 'Day One', description: 'تطبيق يوميات شامل' },
+          { name: 'Thankful', description: 'تطبيق بسيط للامتنان اليومي' }
+        ],
+        websites: [
+          { name: 'Gratitude Practice', url: 'gratitudepractice.org', description: 'دليل ممارسة الامتنان' },
+          { name: 'Positive Psychology', url: 'positivepsychology.com', description: 'علم النفس الإيجابي' },
+          { name: 'الامتنان في الإسلام', url: 'islamweb.net', description: 'الامتنان من منظور إسلامي' }
+        ],
+        tips: [
+          'اكتب 3 أشياء تشعر بالامتنان لها يومياً',
+          'كن محدداً في وصف الأشياء',
+          'اكتب عن أشخاص وليس فقط أشياء',
+          'راجع ما كتبته في الأيام الصعبة',
+          'شارك امتنانك مع الآخرين'
+        ]
+      };
+    } else if (hobbyName.includes('مراقبة الطيور') || hobbyName.includes('طيور من النافذة')) {
+      return {
+        benefits: [
+          'الاتصال مع الطبيعة وتقليل التوتر',
+          'تطوير مهارات الملاحظة والصبر',
+          'تعلم أنواع الطيور المحلية',
+          'تحسين التركيز والهدوء',
+          'استمتاع مجاني بجمال الطبيعة'
+        ],
+        requirements: ['نافذة بإطلالة', 'مقعد مريح', 'دفتر ملاحظات', 'مناظير (اختياري)'],
+        apps: [
+          { name: 'Merlin Bird ID', description: 'تحديد الطيور بالصوت والصورة' },
+          { name: 'eBird', description: 'تسجيل مشاهدات الطيور عالمياً' },
+          { name: 'Bird Sounds', description: 'أصوات الطيور للتعرف عليها' },
+          { name: 'Audubon Bird Guide', description: 'دليل شامل للطيور' }
+        ],
+        websites: [
+          { name: 'All About Birds', url: 'allaboutbirds.org', description: 'موسوعة الطيور الشاملة' },
+          { name: 'Bird Watching Tips', url: 'birdwatching.com', description: 'نصائح مراقبة الطيور' },
+          { name: 'طيور الشرق الأوسط', url: 'middleeastbirds.com', description: 'طيور المنطقة العربية' }
+        ],
+        tips: [
+          'اجلس بهدوء وتجنب الحركات المفاجئة',
+          'راقب في الصباح الباكر أو المساء',
+          'ضع بذور أو ماء لجذب الطيور',
+          'سجل أنواع الطيور التي تراها',
+          'تعلم التمييز بين الذكور والإناث'
+        ]
+      };
+    } else if (hobbyName.includes('السفر الافتراضي') || hobbyName.includes('Google Earth')) {
+      return {
+        benefits: [
+          'استكشاف العالم من المنزل',
+          'توسيع المعرفة الجغرافية والثقافية',
+          'التخطيط لرحلات مستقبلية',
+          'تقليل التوتر بالهروب الافتراضي',
+          'تعلم عن ثقافات وأماكن جديدة'
+        ],
+        requirements: ['جوال أو كمبيوتر', 'اتصال إنترنت جيد', 'فضول للاستكشاف'],
+        apps: [
+          { name: 'Google Earth', description: 'استكشاف الأرض بالصور الفضائية' },
+          { name: 'Street View', description: 'جولات افتراضية في الشوارع' },
+          { name: 'World Atlas', description: 'أطلس عالمي تفاعلي' },
+          { name: 'Virtual Travel', description: 'تطبيق السفر الافتراضي' }
+        ],
+        websites: [
+          { name: 'Google Earth', url: 'earth.google.com', description: 'النسخة الويب من Google Earth' },
+          { name: 'Virtual Museum Tours', url: 'virtualmuseums.io', description: 'جولات افتراضية في المتاحف' },
+          { name: 'World Cam', url: 'worldcam.eu', description: 'كاميرات مباشرة من حول العالم' }
+        ],
+        tips: [
+          'اختر دولة عشوائية لاستكشافها',
+          'ابحث عن المعالم الشهيرة',
+          'استخدم Street View للجولات',
+          'تعلم حقائق مثيرة عن الأماكن',
+          'شارك الاكتشافات مع الأصدقاء'
+        ]
+      };
+    } else if (hobbyName.includes('تنظيم الهاتف') || hobbyName.includes('Widgetsmith')) {
+      return {
+        benefits: [
+          'تحسين الإنتاجية وسهولة الوصول',
+          'تطوير مهارات التنظيم الرقمي',
+          'تخصيص الجوال ليعكس شخصيتك',
+          'تقليل الوقت المهدر في البحث',
+          'إنشاء بيئة رقمية جميلة ومنظمة'
+        ],
+        requirements: ['جوال ذكي', 'تطبيقات التخصيص', 'ذوق في التصميم', 'صبر للتنظيم'],
+        apps: [
+          { name: 'Widgetsmith', description: 'إنشاء ويدجت مخصصة لآيفون' },
+          { name: 'Shortcuts', description: 'إنشاء اختصارات مخصصة' },
+          { name: 'Nova Launcher', description: 'لانشر مخصص لأندرويد' },
+          { name: 'KWGT', description: 'ويدجت مخصصة لأندرويد' }
+        ],
+        websites: [
+          { name: 'iPhone Setup Ideas', url: 'iphonesetup.com', description: 'أفكار تنظيم الآيفون' },
+          { name: 'Android Customization', url: 'androidcustom.com', description: 'تخصيص الأندرويد' },
+          { name: 'Widget Ideas', url: 'widgetideas.net', description: 'أفكار للويدجت' }
+        ],
+        tips: [
+          'نظم التطبيقات في مجلدات حسب الاستخدام',
+          'استخدم ويدجت للمعلومات المهمة',
+          'اختر خلفية تناسب الويدجت',
+          'قلل عدد التطبيقات في الشاشة الرئيسية',
+          'استخدم الاختصارات للمهام المتكررة'
+        ]
+      };
+    } else if (hobbyName.includes('حل الألغاز') || hobbyName.includes('ألغاز ذهنية')) {
+      return {
+        benefits: [
+          'تحسين القدرات الذهنية والذاكرة',
+          'تطوير مهارات حل المشاكل',
+          'تأخير علامات الشيخوخة الذهنية',
+          'زيادة التركيز والانتباه',
+          'الاستمتاع بالتحدي الذهني'
+        ],
+        requirements: ['جوال أو كمبيوتر', 'تركيز ذهني', 'صبر ومثابرة'],
+        apps: [
+          { name: 'Lumosity', description: 'ألعاب تدريب الدماغ العلمية' },
+          { name: 'Peak', description: 'ألغاز وتحديات ذهنية متنوعة' },
+          { name: 'Puzzle Baron', description: 'موقع ألغاز متخصص' },
+          { name: 'Brain Training', description: 'تدريب الدماغ الشامل' }
+        ],
+        websites: [
+          { name: 'Puzzle Baron', url: 'puzzlebaron.com', description: 'مجموعة ضخمة من الألغاز' },
+          { name: 'Brain Games', url: 'braingames.com', description: 'ألعاب العقل المجانية' },
+          { name: 'ألغاز عربية', url: 'alghaz.net', description: 'ألغاز باللغة العربية' }
+        ],
+        tips: [
+          'ابدأ بألغاز سهلة ثم زد الصعوبة',
+          'حل لغز واحد يومياً كحد أدنى',
+          'نوع في أنواع الألغاز (رياضية، منطقية، لغوية)',
+          'لا تستسلم بسرعة - فكر من زوايا مختلفة',
+          'شارك الألغاز الصعبة مع الآخرين'
+        ]
+      };
+    } else if (hobbyName.includes('ضغط الأوراق') || hobbyName.includes('ضغط الزهور')) {
+      return {
+        benefits: [
+          'حفظ جمال الطبيعة إلى الأبد',
+          'إنشاء ديكورات طبيعية جميلة',
+          'تطوير الصبر والدقة',
+          'الاتصال العميق مع الطبيعة',
+          'إنتاج هدايا طبيعية فريدة'
+        ],
+        requirements: ['أوراق وزهور طازجة', 'كتب ثقيلة', 'ورق نشاف', 'صبر لأسابيع'],
+        apps: [
+          { name: 'Plant Press Guide', description: 'دليل ضغط النباتات' },
+          { name: 'Flower Identification', description: 'تحديد أنواع الزهور' },
+          { name: 'Pressed Flower Art', description: 'فن الزهور المضغوطة' },
+          { name: 'Nature Journal', description: 'يوميات الطبيعة' }
+        ],
+        websites: [
+          { name: 'Pressed Flower Art', url: 'pressedflowerart.com', description: 'تقنيات ضغط الزهور' },
+          { name: 'Botanical Pressing', url: 'botanicalpress.org', description: 'الضغط النباتي التقليدي' },
+          { name: 'Nature Crafts', url: 'naturecrafts.com', description: 'حرف طبيعية' }
+        ],
+        tips: [
+          'اختر أوراق وزهور في أفضل حالاتها',
+          'جفف النباتات بالمناديل أولاً',
+          'ضعها بين ورق نشاف في كتاب ثقيل',
+          'انتظر 2-4 أسابيع للجفاف الكامل',
+          'استخدمها في إطارات أو بطاقات'
+        ]
+      };
+    } else if (hobbyName.includes('تعلم كلمات بلغة جديدة') || hobbyName.includes('Duolingo')) {
+      return {
+        benefits: [
+          'توسيع الآفاق الثقافية والمهنية',
+          'تحسين الذاكرة والقدرات الذهنية',
+          'فتح فرص سفر وعمل جديدة',
+          'التواصل مع أشخاص من ثقافات مختلفة',
+          'تطوير الثقة بالنفس'
+        ],
+        requirements: ['جوال أو كمبيوتر', '15 دقيقة يومياً', 'دافع قوي للتعلم'],
+        apps: [
+          { name: 'Duolingo', description: 'أشهر تطبيق تعلم اللغات مجاناً' },
+          { name: 'Babbel', description: 'دروس لغة تفاعلية شاملة' },
+          { name: 'Busuu', description: 'تعلم اللغات مع متحدثين أصليين' },
+          { name: 'Memrise', description: 'حفظ المفردات بتقنيات الذاكرة' }
+        ],
+        websites: [
+          { name: 'Duolingo Web', url: 'duolingo.com', description: 'النسخة الويب المجانية' },
+          { name: 'Language Exchange', url: 'languageexchange.com', description: 'تبادل اللغات مع الآخرين' },
+          { name: 'Google Translate', url: 'translate.google.com', description: 'مترجم فوري ودليل نطق' }
+        ],
+        tips: [
+          'ابدأ بـ 5 كلمات بسيطة: مرحبا، شكراً، كيف حالك',
+          'تدرب يومياً ولو لـ 10 دقائق',
+          'استخدم الكلمات الجديدة في جمل',
+          'استمع لموسيقى باللغة الجديدة',
+          'تحدث مع نفسك باللغة الجديدة'
+        ]
+      };
+    } else if (hobbyName.includes('رسم الأشكال الهندسية') || hobbyName.includes('هندسية متداخلة')) {
+      return {
+        benefits: [
+          'تطوير مهارات الرياضيات والهندسة',
+          'تحسين الدقة والتركيز',
+          'إنشاء تصميمات زخرفية جميلة',
+          'تهدئة العقل والاسترخاء',
+          'تطوير الحس الفني والجمالي'
+        ],
+        requirements: ['ورق رسم', 'قلم رصاص', 'مسطرة', 'برجل (كومباس)', 'ممحاة'],
+        apps: [
+          { name: 'Geometry Pad', description: 'رسم الأشكال الهندسية رقمياً' },
+          { name: 'Sacred Geometry', description: 'أنماط الهندسة المقدسة' },
+          { name: 'Mandala Creator', description: 'إنشاء أنماط هندسية دائرية' },
+          { name: 'Pattern Design', description: 'تصميم الأنماط الهندسية' }
+        ],
+        websites: [
+          { name: 'Geometric Patterns', url: 'geometricpatterns.com', description: 'أنماط هندسية متنوعة' },
+          { name: 'Islamic Geometry', url: 'islamicgeometry.com', description: 'الهندسة الإسلامية التراثية' },
+          { name: 'Math Art', url: 'mathart.org', description: 'الفن الرياضي والهندسي' }
+        ],
+        tips: [
+          'ابدأ بأشكال بسيطة: دوائر، مربعات، مثلثات',
+          'استخدم المسطرة والبرجل للدقة',
+          'اربط الأشكال لتكوين أنماط متداخلة',
+          'جرب ألوان مختلفة لتمييز الأشكال',
+          'ادرس الأنماط التراثية للإلهام'
+        ]
+      };
     }
     
     // تفاصيل عامة للهوايات الأخرى
