@@ -10,6 +10,8 @@ import string
 from datetime import datetime, timedelta
 from typing import Optional
 import time
+import uuid
+import hashlib
 
 app = FastAPI(
     title="AI Hobby Recommender",
@@ -112,10 +114,23 @@ def get_password_hash(password):
 
 def generate_user_code():
     """توليد كود مستخدم فريد"""
-    # 🔥 إضافة timestamp لضمان الفرادة
-    timestamp_part = str(int(time.time()))[-3:]  # آخر 3 أرقام من timestamp
-    random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=3))
-    return random_part + timestamp_part
+    import uuid
+    import hashlib
+    
+    # 🔥 استخدام timestamp دقيق + random UUID + process ID
+    timestamp = str(time.time()).replace('.', '')[-6:]  # آخر 6 أرقام من timestamp مع microseconds
+    uuid_part = str(uuid.uuid4()).replace('-', '')[:4]  # 4 أحرف من UUID عشوائي
+    
+    # دمج وتحويل لأحرف كبيرة مع أرقام
+    combined = f"{uuid_part}{timestamp}"
+    
+    # ضمان الطول = 6 أحرف/أرقام
+    if len(combined) > 6:
+        combined = combined[:6]
+    elif len(combined) < 6:
+        combined = combined + ''.join(random.choices(string.ascii_uppercase + string.digits, k=6-len(combined)))
+    
+    return combined.upper()
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     if not DATABASE_AVAILABLE or not jwt:
@@ -263,9 +278,11 @@ def register(user_data: dict):
             }
         
         # النظام المتقدم (إذا متاح)
-        db = next(get_db(), None)
-        if DATABASE_AVAILABLE and db and User:
+        if DATABASE_AVAILABLE and SessionLocal and User:
+            db = SessionLocal()
             try:
+                print(f"🔄 Attempting database registration for: {username}")
+                
                 # فحص المستخدم الموجود
                 existing_user = db.query(User).filter(
                     (User.username == username) | (User.email == email)
@@ -273,6 +290,7 @@ def register(user_data: dict):
                 
                 if existing_user:
                     # إذا موجود، سجل دخول بدلاً من التسجيل
+                    print(f"✅ Found existing user: {existing_user.username}")
                     return {
                         "message": "🎉 تم العثور على المستخدم وتم تسجيل الدخول!",
                         "user": {
@@ -300,6 +318,8 @@ def register(user_data: dict):
                 db.commit()
                 db.refresh(db_user)
                 
+                print(f"✅ Successfully created user in database: {db_user.username} with code: {db_user.user_code}")
+                
                 return {
                     "message": "🎉 تم التسجيل في قاعدة البيانات!",
                     "user": {
@@ -312,9 +332,11 @@ def register(user_data: dict):
                     "access_token": create_access_token(data={"sub": username})
                 }
             except Exception as e:
-                print(f"Database registration failed: {e}")
+                print(f"❌ Database registration failed: {e}")
+                db.rollback()
                 # نزول للنظام البسيط
-                pass
+            finally:
+                db.close()
         
         # النظام البسيط (always works)
         simple_id = hash(f"{username}_{email}_{time.time()}") % 100000
@@ -1096,6 +1118,30 @@ def debug_user_codes():
             }
     except Exception as e:
         return {"error": str(e)}
+
+@app.get("/api/debug/test-codes")
+def test_code_generation():
+    """Test user code generation uniqueness."""
+    codes = []
+    for i in range(20):
+        code = generate_user_code()
+        codes.append(code)
+        # انتظار قصير لضمان timestamp مختلف
+        import time
+        time.sleep(0.01)
+    
+    duplicates = []
+    for code in set(codes):
+        if codes.count(code) > 1:
+            duplicates.append(code)
+    
+    return {
+        "generated_codes": codes,
+        "total_generated": len(codes),
+        "unique_codes": len(set(codes)),
+        "duplicates": duplicates,
+        "all_unique": len(duplicates) == 0
+    }
 
 # Configure CORS
 app.add_middleware(
