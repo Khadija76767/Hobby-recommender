@@ -77,11 +77,12 @@ const HobbyDetailModal = ({ open, onClose, hobby }) => {
     }
   };
 
-  // بيانات تفصيلية حسب نوع الهواية
+  // بيانات تفصيلية مخصصة لكل هواية على حدة
   const getHobbyDetails = (hobby) => {
-    const category = hobby?.category || '';
+    const hobbyName = hobby?.name || '';
     
-    if (category.includes('روحانية')) {
+    // تفاصيل مخصصة حسب اسم الهواية بالضبط
+    if (hobbyName.includes('حفظ آية') || hobbyName.includes('حفظ القرآن')) {
       return {
         benefits: [
           'تطوير الروحانية والاتصال مع الله',
@@ -94,11 +95,13 @@ const HobbyDetailModal = ({ open, onClose, hobby }) => {
         apps: [
           { name: 'تطبيق القرآن الكريم', description: 'مصحف رقمي مع التلاوة والتفسير' },
           { name: 'حفظ القرآن', description: 'تطبيق مخصص لمساعدة الحفظ والمراجعة' },
-          { name: 'آيات', description: 'تذكيرات يومية وبرنامج حفظ تدريجي' }
+          { name: 'آيات', description: 'تذكيرات يومية وبرنامج حفظ تدريجي' },
+          { name: 'أذكاري', description: 'تطبيق للأذكار اليومية والدعاء' }
         ],
         websites: [
           { name: 'موقع القرآن الكريم', url: 'quran.com', description: 'مصحف شامل مع التفاسير' },
-          { name: 'تدبر', url: 'tadabbur.com', description: 'منصة لتدبر وفهم القرآن' }
+          { name: 'تدبر', url: 'tadabbur.com', description: 'منصة لتدبر وفهم القرآن' },
+          { name: 'إسلام ويب', url: 'islamweb.net', description: 'موقع شامل للعلوم الإسلامية' }
         ],
         tips: [
           'ابدأ بآية واحدة واتقنها قبل الانتقال للتالية',
@@ -108,7 +111,65 @@ const HobbyDetailModal = ({ open, onClose, hobby }) => {
           'ادع الله أن يعينك على الحفظ والفهم'
         ]
       };
-    } else if (category.includes('فنون رقمية')) {
+    } else if (hobbyName.includes('طي الورق') || hobbyName.includes('أوريغامي')) {
+      return {
+        benefits: [
+          'تحسين التركيز والدقة في التفاصيل',
+          'تطوير مهارات حل المشاكل المكانية',
+          'الاسترخاء وتقليل التوتر',
+          'تحسين مهارات الرياضيات الهندسية',
+          'إنتاج قطع فنية جميلة كهدايا'
+        ],
+        requirements: ['ورق ملون أو عادي', 'مقص صغير (اختياري)', 'مسطرة', 'دليل أو فيديو'],
+        apps: [
+          { name: 'Origami Instructions', description: 'دليل خطوة بخطوة لطي الورق' },
+          { name: 'How to Make Origami', description: 'تطبيق مع رسوم متحركة للطي' },
+          { name: 'Origami Paper', description: 'أنماط ورق رقمية للطباعة' },
+          { name: 'Paper Folding 3D', description: 'تطبيق ثلاثي الأبعاد لتعلم الأوريغامي' }
+        ],
+        websites: [
+          { name: 'Origami Way', url: 'origami-way.com', description: 'دروس مجانية للمبتدئين' },
+          { name: 'Origami Club', url: 'en.origami-club.com', description: 'مجتمع محبي الأوريغامي' },
+          { name: 'يوتيوب قناة الأوريغامي', url: 'youtube.com', description: 'قنوات متخصصة في طي الورق' }
+        ],
+        tips: [
+          'ابدأ بالأشكال البسيطة مثل الطائر والوردة',
+          'استخدم ورق مربع الشكل',
+          'اتبع التعليمات خطوة بخطوة ببطء',
+          'تدرب على نفس الشكل عدة مرات',
+          'شارك إبداعاتك مع الأصدقاء'
+        ]
+      };
+    } else if (hobbyName.includes('قصيدة') || hobbyName.includes('شعر')) {
+      return {
+        benefits: [
+          'التعبير عن المشاعر والأفكار بطريقة جميلة',
+          'تطوير المهارات اللغوية والبلاغية',
+          'تحسين الذاكرة والإبداع',
+          'العلاج النفسي من خلال الكتابة',
+          'بناء الثقة في التعبير عن الذات'
+        ],
+        requirements: ['دفتر أو ورق', 'قلم', 'مكان هادئ للإلهام', 'قاموس (اختياري)'],
+        apps: [
+          { name: 'الشاعر', description: 'تطبيق لكتابة وتنظيم القصائد' },
+          { name: 'بحور الشعر', description: 'تعلم أوزان وبحور الشعر العربي' },
+          { name: 'قاموس المعاني', description: 'للبحث عن المرادفات والمعاني' },
+          { name: 'ديوان شعري', description: 'لحفظ وتنظيم قصائدك الشخصية' }
+        ],
+        websites: [
+          { name: 'أدب', url: 'adab.com', description: 'منصة للأدب والشعر العربي' },
+          { name: 'الديوان', url: 'aldiwan.net', description: 'مكتبة شعرية شاملة' },
+          { name: 'شعراء العرب', url: 'poets.org', description: 'أكبر موقع للشعر العربي' }
+        ],
+        tips: [
+          'ابدأ بكتابة مشاعرك بصدق',
+          'اقرأ شعر الآخرين للإلهام',
+          'لا تقلق من الوزن في البداية',
+          'اكتب عن تجاربك الشخصية',
+          'راجع وحسن قصائدك'
+        ]
+      };
+    } else if (hobbyName.includes('رسم رقمي') || hobbyName.includes('رسم بالجوال')) {
       return {
         benefits: [
           'تطوير مهارات تقنية قيمة في سوق العمل',
@@ -122,7 +183,7 @@ const HobbyDetailModal = ({ open, onClose, hobby }) => {
           { name: 'Procreate', description: 'أفضل تطبيق رسم رقمي للـ iPad (مدفوع)' },
           { name: 'Adobe Fresco', description: 'تطبيق مجاني بأدوات احترافية' },
           { name: 'Autodesk Sketchbook', description: 'تطبيق مجاني بواجهة بسيطة للمبتدئين' },
-          { name: 'ArtRage', description: 'محاكاة رسم تقليدي على الشاشة' }
+          { name: 'Concepts', description: 'للرسم الهندسي والتصميم المتقدم' }
         ],
         websites: [
           { name: 'YouTube Art Tutorials', url: 'youtube.com', description: 'دروس مجانية للرسم الرقمي' },
@@ -137,59 +198,178 @@ const HobbyDetailModal = ({ open, onClose, hobby }) => {
           'شارك أعمالك للحصول على تقييم'
         ]
       };
-    } else if (category.includes('طبيعة')) {
+    } else if (hobbyName.includes('زراعة البذور') || hobbyName.includes('زراعة')) {
       return {
         benefits: [
           'الاتصال مع الطبيعة وتقليل التوتر',
           'تعلم الصبر ومراقبة النمو',
           'تحسين جودة الهواء في المنزل',
           'تطوير المسؤولية والاهتمام',
-          'هواية مستدامة وصديقة للبيئة'
+          'إنتاج طعام طبيعي وصحي'
         ],
-        requirements: ['بذور أو نبتة صغيرة', 'كوب أو إناء', 'ماء نظيف', 'مكان بإضاءة جيدة'],
+        requirements: ['بذور', 'كوب أو إناء', 'ماء نظيف', 'تربة (اختياري)', 'مكان بإضاءة جيدة'],
         apps: [
           { name: 'PlantNet', description: 'تحديد أنواع النباتات بالصور' },
           { name: 'Garden Timeline', description: 'تتبع نمو النباتات وجدولة الري' },
-          { name: 'Moon & Garden', description: 'أفضل أوقات الزراعة حسب القمر' }
+          { name: 'Moon & Garden', description: 'أفضل أوقات الزراعة حسب القمر' },
+          { name: 'PlantIn', description: 'تطبيق شامل لرعاية النباتات' }
         ],
         websites: [
           { name: 'Garden.org', url: 'garden.org', description: 'دليل شامل للزراعة المنزلية' },
-          { name: 'موقع زراعة', url: 'zira3a.net', description: 'معلومات عن الزراعة باللغة العربية' }
+          { name: 'موقع زراعة', url: 'zira3a.net', description: 'معلومات عن الزراعة باللغة العربية' },
+          { name: 'الزراعة المنزلية', url: 'homegarden.com', description: 'نصائح للزراعة في البيت' }
         ],
         tips: [
-          'ابدأ بالنباتات السهلة مثل النعناع',
+          'ابدأ بالنباتات السهلة مثل النعناع والبقدونس',
           'تأكد من وجود فتحات تصريف في الإناء',
-          'اسق النبات عند جفاف التربة',
-          'ضع النبات قرب النافذة للضوء',
-          'سجل تقدم النمو بالصور'
+          'اسق النبات عند جفاف التربة السطحية',
+          'ضع النبات قرب النافذة للضوء الطبيعي',
+          'سجل تقدم النمو بالصور يومياً'
         ]
       };
-    } else if (category.includes('تعليم')) {
+    } else if (hobbyName.includes('تصوير') || hobbyName.includes('صور')) {
+      return {
+        benefits: [
+          'توثيق اللحظات الجميلة والذكريات',
+          'تطوير مهارات الملاحظة والتركيز',
+          'التعبير الفني عن وجهة النظر',
+          'تحسين مهارات التكنولوجيا',
+          'إمكانية العمل المستقل في التصوير'
+        ],
+        requirements: ['كاميرا جوال أو كاميرا رقمية', 'عين فنية', 'صبر وممارسة'],
+        apps: [
+          { name: 'VSCO', description: 'تحرير احترافي للصور مع فلاتر جميلة' },
+          { name: 'Lightroom Mobile', description: 'تطبيق Adobe المجاني للتحرير' },
+          { name: 'Snapseed', description: 'تطبيق مجاني من Google للتحرير' },
+          { name: 'Camera+ 2', description: 'تطبيق كاميرا متقدم مع إعدادات يدوية' }
+        ],
+        websites: [
+          { name: 'Photography Blog', url: 'photographyblog.com', description: 'نصائح ودروس تصوير' },
+          { name: '500px', url: '500px.com', description: 'مجتمع المصورين وعرض الأعمال' },
+          { name: 'Flickr', url: 'flickr.com', description: 'منصة لمشاركة الصور' }
+        ],
+        tips: [
+          'اهتم بالإضاءة الطبيعية',
+          'اتبع قاعدة الأثلاث في التكوين',
+          'صور من زوايا مختلفة',
+          'ركز على التفاصيل الصغيرة',
+          'تدرب يومياً على التصوير'
+        ]
+      };
+    } else if (hobbyName.includes('طبخ') || hobbyName.includes('طعام')) {
+      return {
+        benefits: [
+          'توفير المال وتحسين الصحة',
+          'تطوير الإبداع في المطبخ',
+          'تعلم مهارة حياتية مهمة',
+          'قضاء وقت ممتع مع العائلة',
+          'اكتشاف نكهات وثقافات جديدة'
+        ],
+        requirements: ['3 مكونات بسيطة', 'أدوات مطبخ أساسية', 'موقد', 'إبداع وتجريب'],
+        apps: [
+          { name: 'Yummly', description: 'وصفات مخصصة حسب المكونات المتاحة' },
+          { name: 'Tasty', description: 'فيديوهات قصيرة لوصفات سهلة' },
+          { name: 'Kitchen Stories', description: 'وصفات مع تعليمات خطوة بخطوة' },
+          { name: 'شهية', description: 'وصفات عربية وشرق أوسطية' }
+        ],
+        websites: [
+          { name: 'فتافيت', url: 'fatafeat.com', description: 'وصفات عربية متنوعة' },
+          { name: 'All Recipes', url: 'allrecipes.com', description: 'أكبر موقع وصفات عالمي' },
+          { name: 'طبخ عربي', url: 'tabkh.com', description: 'وصفات تراثية وحديثة' }
+        ],
+        tips: [
+          'ابدأ بوصفات بسيطة من 3 مكونات',
+          'اقرأ الوصفة كاملة قبل البدء',
+          'حضر جميع المكونات مقدماً',
+          'تذوق الطعام أثناء الطبخ',
+          'لا تخف من التجريب والتعديل'
+        ]
+      };
+    } else if (hobbyName.includes('قراءة') || hobbyName.includes('كتاب')) {
       return {
         benefits: [
           'توسيع المعرفة وتطوير الثقافة العامة',
           'تحسين التركيز ومهارات التحليل',
           'تطوير مهارات التفكير النقدي',
           'زيادة المفردات وتحسين اللغة',
-          'فتح آفاق جديدة للتعلم'
+          'الهروب الإيجابي من ضغوط الحياة'
         ],
-        requirements: ['كتاب أو مصدر قراءة', 'مكان هادئ', 'وقت مخصص', 'دفتر ملاحظات'],
+        requirements: ['كتاب ورقي أو إلكتروني', 'مكان هادئ ومريح', 'إضاءة جيدة', 'دفتر ملاحظات'],
         apps: [
-          { name: 'Kindle', description: 'مكتبة رقمية ضخمة للكتب' },
+          { name: 'Kindle', description: 'مكتبة رقمية ضخمة للكتب الإلكترونية' },
           { name: 'Audible', description: 'كتب صوتية للاستماع أثناء التنقل' },
-          { name: 'Goodreads', description: 'تتبع قراءاتك واكتشاف كتب جديدة' }
+          { name: 'Goodreads', description: 'تتبع قراءاتك واكتشاف كتب جديدة' },
+          { name: 'أبجد', description: 'منصة عربية لمحبي القراءة' }
         ],
         websites: [
-          { name: 'مكتبة نور', url: 'noor-book.com', description: 'مكتبة عربية مجانية' },
+          { name: 'مكتبة نور', url: 'noor-book.com', description: 'مكتبة عربية مجانية شاملة' },
           { name: 'Project Gutenberg', url: 'gutenberg.org', description: 'كتب كلاسيكية مجانية' },
-          { name: 'أبجد', url: 'abjjad.com', description: 'منصة قراء عربية' }
+          { name: 'هنداوي', url: 'hindawi.org', description: 'كتب عربية مجانية عالية الجودة' }
         ],
         tips: [
-          'حدد هدف قراءة يومي واقعي',
-          'اختر مواضيع تهمك شخصياً',
-          'خذ ملاحظات أثناء القراءة',
+          'حدد هدف قراءة يومي واقعي (10-20 صفحة)',
+          'اختر مواضيع تهمك شخصياً في البداية',
+          'خذ ملاحظات أو اقتباسات مهمة',
           'ناقش ما قرأته مع الآخرين',
-          'نوع بين أنواع الكتب المختلفة'
+          'نوع بين الأنواع الأدبية المختلفة'
+        ]
+      };
+    } else if (hobbyName.includes('رسم') && !hobbyName.includes('رقمي')) {
+      return {
+        benefits: [
+          'تطوير المهارات الحركية الدقيقة',
+          'تحسين التركيز والملاحظة',
+          'التعبير الفني عن المشاعر',
+          'الاسترخاء وتقليل التوتر',
+          'بناء الثقة بالنفس والإبداع'
+        ],
+        requirements: ['ورق رسم', 'أقلام رصاص', 'ممحاة', 'أقلام ملونة (اختياري)'],
+        apps: [
+          { name: 'How to Draw', description: 'دروس تعليمية خطوة بخطوة للرسم' },
+          { name: 'Drawing Ideas', description: 'أفكار ومراجع للرسم' },
+          { name: 'SketchBook', description: 'دفتر رسم رقمي للتمرين' },
+          { name: 'يوتيوب', description: 'قنوات تعليم الرسم المجانية' }
+        ],
+        websites: [
+          { name: 'DrawSpace', url: 'drawspace.com', description: 'دروس رسم مجانية للمبتدئين' },
+          { name: 'Proko', url: 'proko.com', description: 'دروس رسم احترافية' },
+          { name: 'تعلم الرسم', url: 'learn-to-draw.com', description: 'موقع عربي لتعليم الرسم' }
+        ],
+        tips: [
+          'ابدأ بالأشكال الهندسية البسيطة',
+          'تدرب على رسم الخطوط المستقيمة والمنحنيات',
+          'ارسم ما تراه حولك يومياً',
+          'لا تمحو كل خطأ - تعلم منه',
+          'احتفظ بجميع رسوماتك لترى التطور'
+        ]
+      };
+    } else if (hobbyName.includes('موسيقى') || hobbyName.includes('نوتات')) {
+      return {
+        benefits: [
+          'تطوير السمع الموسيقي والذوق الفني',
+          'تحسين التناسق والتركيز',
+          'التعبير عن المشاعر بلغة عالمية',
+          'تقوية الذاكرة والانضباط',
+          'فرصة للعب مع آخرين اجتماعياً'
+        ],
+        requirements: ['آلة موسيقية أو تطبيق', 'صبر وممارسة منتظمة', 'مكان هادئ'],
+        apps: [
+          { name: 'Simply Piano', description: 'تعلم البيانو بطريقة تفاعلية ممتعة' },
+          { name: 'Yousician', description: 'تعلم آلات متعددة: بيانو، جيتار، كمان' },
+          { name: 'Piano Academy', description: 'دروس بيانو من المبتدئ للمتقدم' },
+          { name: 'Perfect Piano', description: 'بيانو افتراضي للتمرين' }
+        ],
+        websites: [
+          { name: 'Music Theory', url: 'musictheory.net', description: 'تعلم نظريات الموسيقى' },
+          { name: 'Piano Nanny', url: 'pianonanny.com', description: 'دروس بيانو للأطفال والكبار' },
+          { name: 'موسيقار', url: 'musicar.net', description: 'موقع عربي لتعليم الموسيقى' }
+        ],
+        tips: [
+          'ابدأ بتعلم 5 نوتات أساسية فقط',
+          'تدرب 10-15 دقيقة يومياً بانتظام',
+          'استمع للموسيقى التي تريد تعلمها',
+          'لا تستعجل - الموسيقى تحتاج صبر',
+          'سجل نفسك وأنت تعزف لتتبع التقدم'
         ]
       };
     }
@@ -205,17 +385,21 @@ const HobbyDetailModal = ({ open, onClose, hobby }) => {
       ],
       requirements: ['أدوات بسيطة', 'وقت للممارسة', 'مكان مناسب'],
       apps: [
-        { name: 'YouTube', description: 'دروس تعليمية مجانية' },
-        { name: 'Pinterest', description: 'أفكار وإلهام إبداعي' }
+        { name: 'YouTube', description: 'دروس تعليمية مجانية لكل الهوايات' },
+        { name: 'Pinterest', description: 'أفكار وإلهام إبداعي متنوع' },
+        { name: 'WikiHow', description: 'دليل خطوة بخطوة لتعلم المهارات' }
       ],
       websites: [
-        { name: 'ويكيهاو', url: 'ar.wikihow.com', description: 'دليل خطوة بخطوة' }
+        { name: 'ويكيهاو', url: 'ar.wikihow.com', description: 'دليل خطوة بخطوة بالعربية' },
+        { name: 'يوتيوب', url: 'youtube.com', description: 'فيديوهات تعليمية مجانية' },
+        { name: 'Pinterest', url: 'pinterest.com', description: 'أفكار وإلهام بصري' }
       ],
       tips: [
-        'ابدأ بخطوات بسيطة',
-        'تدرب بانتظام',
-        'لا تخف من الأخطاء',
-        'استمتع بالعملية'
+        'ابدأ بخطوات بسيطة وواقعية',
+        'تدرب بانتظام ولو لوقت قصير',
+        'لا تخف من الأخطاء - هي جزء من التعلم',
+        'استمتع بالعملية وليس فقط النتيجة',
+        'شارك تجربتك مع الآخرين للتشجيع'
       ]
     };
   };
