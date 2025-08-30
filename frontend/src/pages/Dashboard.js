@@ -27,6 +27,7 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import RobotAssistant from '../components/RobotAssistant';
 import DailyHobbies from '../components/DailyHobbies';
+import ConnectWithFriends from '../components/ConnectWithFriends';
 
 // Tab panel component
 function TabPanel(props) {
@@ -169,8 +170,98 @@ const Dashboard = () => {
         <Grid container spacing={4}>
           {/* Robot Assistant */}
           <Grid item xs={12}>
-            <RobotAssistant />
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                borderRadius: 4,
+                background: 'linear-gradient(135deg, #E8F5FF 0%, #FFF4F9 100%)',
+              }}
+            >
+              <RobotAssistant onMoodChange={setCurrentMood} />
+            </Paper>
           </Grid>
+
+          {/* Daily Hobbies */}
+          <Grid item xs={12} md={8}>
+            <DailyHobbies 
+              onHobbySelect={setCurrentHobbyForSharing}
+            />
+          </Grid>
+
+          {/* Daily Reflection Button */}
+          <Grid item xs={12} md={4}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                borderRadius: 4,
+                background: 'linear-gradient(135deg, #FFF4E8 0%, #FFE8F5 100%)',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+              }}
+            >
+              <Typography
+                variant="h5"
+                fontFamily="Patrick Hand"
+                gutterBottom
+                sx={{ color: theme.palette.primary.main }}
+              >
+                Share Your Daily Thoughts ✨
+              </Typography>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{ mb: 3 }}
+              >
+                Take a moment to reflect on your day and capture your thoughts
+              </Typography>
+              <Button
+                component={RouterLink}
+                to="/reflection"
+                variant="contained"
+                startIcon={<CreateIcon />}
+                sx={{
+                  bgcolor: 'rgba(255, 181, 232, 0.9)',
+                  color: '#4A4A4A',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 181, 232, 0.7)',
+                  },
+                  py: 1.5,
+                  px: 4,
+                  borderRadius: 3,
+                }}
+              >
+                Write Today's Reflection
+              </Button>
+            </Paper>
+          </Grid>
+
+        {/* Connect with Friends */}
+        <Grid item xs={12}>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
+              borderRadius: 4,
+              background: 'linear-gradient(135deg, #F0F8FF 0%, #E8F5E8 100%)',
+            }}
+          >
+            <Typography
+              variant="h5"
+              fontFamily="Patrick Hand"
+              gutterBottom
+              sx={{ color: theme.palette.primary.main, mb: 3 }}
+            >
+              🤝 Connect & Share with Friends
+            </Typography>
+            <ConnectWithFriends currentHobby={currentHobbyForSharing} />
+          </Paper>
+        </Grid>
         </Grid>
       </Container>
     </Box>
