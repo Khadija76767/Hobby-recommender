@@ -13,18 +13,14 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
   Snackbar,
   Alert,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import StarIcon from '@mui/icons-material/Star';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useAuth } from '../contexts/AuthContext';
 
 const ConnectWithFriends = ({ currentHobby }) => {
