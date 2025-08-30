@@ -1143,6 +1143,81 @@ def test_code_generation():
         "all_unique": len(duplicates) == 0
     }
 
+@app.post("/api/debug/fix-user-codes")
+def fix_user_codes():
+    """Fix duplicate user codes by regenerating them."""
+    try:
+        if DATABASE_AVAILABLE and SessionLocal:
+            db = SessionLocal()
+            try:
+                users = db.query(User).all()
+                
+                if not users:
+                    return {
+                        "message": "No users found in database",
+                        "users_updated": 0
+                    }
+                
+                # جمع الأكواد الحالية للتحقق من التكرار
+                current_codes = {}
+                for user in users:
+                    if user.user_code in current_codes:
+                        current_codes[user.user_code].append(user.id)
+                    else:
+                        current_codes[user.user_code] = [user.id]
+                
+                # البحث عن التكرارات
+                duplicates = {code: user_ids for code, user_ids in current_codes.items() if len(user_ids) > 1}
+                
+                if not duplicates:
+                    return {
+                        "message": "No duplicate codes found",
+                        "duplicates": duplicates,
+                        "total_users": len(users)
+                    }
+                
+                # إعادة تعيين الأكواد المتكررة
+                updated_users = []
+                for code, user_ids in duplicates.items():
+                    # ترك المستخدم الأول، وإعادة تعيين الباقي
+                    for user_id in user_ids[1:]:  # تخطي المستخدم الأول
+                        user = db.query(User).filter(User.id == user_id).first()
+                        if user:
+                            old_code = user.user_code
+                            new_code = generate_user_code()
+                            
+                            # التأكد من عدم تكرار الكود الجديد
+                            while db.query(User).filter(User.user_code == new_code).first():
+                                new_code = generate_user_code()
+                            
+                            user.user_code = new_code
+                            updated_users.append({
+                                "user_id": user.id,
+                                "username": user.username,
+                                "old_code": old_code,
+                                "new_code": new_code
+                            })
+                
+                db.commit()
+                
+                return {
+                    "message": f"Successfully updated {len(updated_users)} users",
+                    "duplicates_found": duplicates,
+                    "updated_users": updated_users,
+                    "total_users": len(users)
+                }
+                
+            finally:
+                db.close()
+        else:
+            return {
+                "error": "Database not available",
+                "suggestion": "This fix is only needed when using real database"
+            }
+            
+    except Exception as e:
+        return {"error": str(e)}
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
