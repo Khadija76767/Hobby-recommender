@@ -105,39 +105,127 @@ const DailyHobbies = ({ onHobbySelect }) => {
     <Box>
       {/* عنوان الهوايات اليومية */}
       <Paper 
-        elevation={3}
+        elevation={6}
         sx={{ 
-          p: 3, 
-          mb: 3, 
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          p: 4, 
+          mb: 4, 
+          background: 'linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 50%, #45B7D1 100%)',
           color: 'white',
-          textAlign: 'center'
+          textAlign: 'center',
+          borderRadius: 4,
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+            pointerEvents: 'none'
+          }
         }}
       >
-        <CalendarToday sx={{ fontSize: 40, mb: 1 }} />
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          🎯 هوايات اليوم
-        </Typography>
-        <Typography variant="h6" sx={{ opacity: 0.9 }}>
-          {message}
-        </Typography>
-        
-        {cycleInfo && (
-          <Box sx={{ mt: 2 }}>
-            <Chip 
-              label={`الدورة ${cycleInfo.current_cycle}`}
-              sx={{ mr: 1, bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
-            />
-            <Chip 
-              label={`اليوم ${cycleInfo.day_in_cycle}/${14}`}
-              sx={{ mr: 1, bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
-            />
-            <Chip 
-              label={cycleInfo.cycle_progress}
-              sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
-            />
-          </Box>
-        )}
+        <Box sx={{ position: 'relative', zIndex: 1 }}>
+          <CalendarToday sx={{ fontSize: 50, mb: 2, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
+          <Typography 
+            variant="h3" 
+            fontWeight="bold" 
+            gutterBottom
+            sx={{ 
+              textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              background: 'linear-gradient(45deg, #FFE066, #FF6B6B)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+            }}
+          >
+            🎯 هوايات اليوم
+          </Typography>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              opacity: 0.95,
+              fontWeight: 500,
+              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+              mb: 3
+            }}
+          >
+            {message}
+          </Typography>
+          
+          {cycleInfo && (
+            <Box sx={{ mt: 3 }}>
+              <Grid container spacing={2} justifyContent="center">
+                <Grid item>
+                  <Paper
+                    elevation={3}
+                    sx={{ 
+                      px: 3, 
+                      py: 1.5, 
+                      background: 'rgba(255,255,255,0.25)',
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      borderRadius: 3,
+                      textAlign: 'center'
+                    }}
+                  >
+                    <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
+                      🌟 الرحلة {cycleInfo.current_cycle}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                      مجموعة الاكتشاف
+                    </Typography>
+                  </Paper>
+                </Grid>
+                <Grid item>
+                  <Paper
+                    elevation={3}
+                    sx={{ 
+                      px: 3, 
+                      py: 1.5, 
+                      background: 'rgba(255,255,255,0.25)',
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      borderRadius: 3,
+                      textAlign: 'center'
+                    }}
+                  >
+                    <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
+                      📅 اليوم {cycleInfo.day_in_cycle}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                      من أصل 14 يوم
+                    </Typography>
+                  </Paper>
+                </Grid>
+                <Grid item>
+                  <Paper
+                    elevation={3}
+                    sx={{ 
+                      px: 3, 
+                      py: 1.5, 
+                      background: 'rgba(255,255,255,0.25)',
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      borderRadius: 3,
+                      textAlign: 'center'
+                    }}
+                  >
+                    <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
+                      🎯 {cycleInfo.cycle_progress}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                      تقدمك الكلي
+                    </Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+        </Box>
       </Paper>
 
       {/* شبكة الهوايات */}
