@@ -5,16 +5,26 @@ const api = axios.create({
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   },
 });
 
-// Add request interceptor to add token
+// Add request interceptor to add token and fix encoding
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      // ✅ تأكد من أن الـ token لا يحتوي على أحرف غير صالحة
+      const cleanToken = token.replace(/[^\x00-\x7F]/g, ""); // إزالة non-ASCII chars
+      config.headers.Authorization = `Bearer ${cleanToken}`;
     }
+    
+    // 🔧 إصلاح مشكلة Unicode في headers
+    if (config.headers['Content-Type'] && config.headers['Content-Type'].includes('multipart/form-data')) {
+      // السماح لـ Axios بتعيين Content-Type تلقائياً للـ multipart
+      delete config.headers['Content-Type'];
+    }
+    
     return config;
   },
   (error) => {

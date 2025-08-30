@@ -150,16 +150,17 @@ const UserProfile = () => {
       return;
     }
 
+    // 🔧 إنشاء نسخة من الملف باسم آمن (بدون أحرف عربية)
+    const safeFileName = `avatar_${Date.now()}.${file.name.split('.').pop()}`;
+    const safeFile = new File([file], safeFileName, { type: file.type });
+
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', safeFile);
 
     setUploading(true);
     try {
-      const response = await api.post('/api/auth/profile/avatar', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      // 🔧 لا نضع Content-Type يدوياً - دع Axios يتعامل معه تلقائياً
+      const response = await api.post('/api/auth/profile/avatar', formData);
 
       const newAvatarUrl = response.data.avatar_url;
       console.log('✅ New avatar URL:', newAvatarUrl);
