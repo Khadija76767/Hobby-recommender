@@ -31,6 +31,7 @@ class User(Base):
     avatar_url = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
     user_code = Column(String, unique=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)  # 🔥 تاريخ التسجيل
     
     # Add relationship to viewed hobbies
     viewed_hobbies = relationship("UserHobbyView", back_populates="user")

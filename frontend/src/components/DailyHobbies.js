@@ -184,6 +184,27 @@ const DailyHobbies = ({ onHobbySelect }) => {
                     }}
                   >
                     <Typography variant="h6" fontWeight="bold" sx={{ color: '#4A4A4A', fontFamily: 'Patrick Hand' }}>
+                      🗓️ اليوم {cycleInfo.user_day}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#6B6B6B', fontFamily: 'Quicksand' }}>
+                      رحلتك الشخصية
+                    </Typography>
+                  </Paper>
+                </Grid>
+                <Grid item>
+                  <Paper
+                    elevation={2}
+                    sx={{ 
+                      px: 3, 
+                      py: 1.5, 
+                      background: 'rgba(255,255,255,0.95)',
+                      border: '1px solid #FFB5E8',
+                      borderRadius: 3,
+                      textAlign: 'center',
+                      boxShadow: '0 2px 8px rgba(255,181,232,0.2)'
+                    }}
+                  >
+                    <Typography variant="h6" fontWeight="bold" sx={{ color: '#4A4A4A', fontFamily: 'Patrick Hand' }}>
                       🌟 الرحلة {cycleInfo.current_cycle}
                     </Typography>
                     <Typography variant="body2" sx={{ color: '#6B6B6B', fontFamily: 'Quicksand' }}>

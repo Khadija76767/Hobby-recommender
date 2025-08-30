@@ -830,33 +830,73 @@ def get_hobbies():
     }
 
 @app.get("/api/hobbies/daily")
-def daily_hobby():
+def daily_hobby(current_user = Depends(get_current_user)):
     """
-    نظام الهوايات اليومية الذكي:
+    نظام الهوايات اليومية الذكي الشخصي:
+    - كل مستخدم يبدأ رحلته من اليوم 1
     - كل يوم 4 هوايات جديدة من الـ 54
     - لا تكرر نفس الهوايات لمدة 14 يوم
-    - بعد انتهاء الدورة، تبدأ دورة جديدة عشوائية
+    - بعد انتهاء الرحلة، تبدأ رحلة جديدة عشوائية
     """
     from datetime import datetime
     import math
     
-    # حساب اليوم منذ بداية العام (للثبات عبر المستخدمين)
-    today = datetime.now()
-    day_of_year = today.timetuple().tm_yday
+    try:
+        user_id = current_user.get("id", 1)
+        
+        # 🔥 حساب أيام المستخدم منذ التسجيل
+        user_start_date = None
+        
+        # محاولة الحصول على تاريخ التسجيل من قاعدة البيانات
+        if DATABASE_AVAILABLE and SessionLocal:
+            db = SessionLocal()
+            try:
+                user = db.query(User).filter(User.id == user_id).first()
+                if user and hasattr(user, 'created_at') and user.created_at:
+                    user_start_date = user.created_at
+                    print(f"📅 User start date from DB: {user_start_date}")
+            except Exception as e:
+                print(f"⚠️ Could not get user start date: {e}")
+            finally:
+                db.close()
+        
+        # إذا لم نجد تاريخ التسجيل، استخدم تاريخ افتراضي مبني على user_id
+        if not user_start_date:
+            # تاريخ افتراضي: 1 يناير 2024 + عدد أيام = user_id
+            from datetime import date, timedelta
+            base_date = date(2024, 1, 1)
+            user_start_date = base_date + timedelta(days=user_id % 365)
+            print(f"📅 Using calculated start date: {user_start_date}")
+        
+        # حساب عدد الأيام منذ بداية رحلة المستخدم
+        today = datetime.now().date()
+        if hasattr(user_start_date, 'date'):
+            user_start_date = user_start_date.date()
+        
+        days_since_start = (today - user_start_date).days
+        
+        # المستخدم في اليوم رقم (days_since_start + 1)
+        user_day = days_since_start + 1
+        
+        print(f"👤 User {user_id}: Day {user_day} of their journey")
     
-    # كل دورة = 14 يوم (54 هواية ÷ 4 = 13.5 ≈ 14 يوم)
+    except Exception as e:
+        print(f"❌ Error calculating user day: {e}, falling back to day 1")
+        user_day = 1
+    
+    # كل رحلة = 14 يوم (54 هواية ÷ 4 = 13.5 ≈ 14 يوم)
     cycle_length = 14
     hobbies_per_day = 4
     
-    # تحديد الدورة الحالية واليوم داخل الدورة
-    current_cycle = (day_of_year - 1) // cycle_length
-    day_in_cycle = (day_of_year - 1) % cycle_length
+    # تحديد الرحلة الحالية واليوم داخل الرحلة
+    current_cycle = (user_day - 1) // cycle_length
+    day_in_cycle = (user_day - 1) % cycle_length
     
-    # إنشاء seed للعشوائية بناءً على الدورة (لضمان عشوائية مختلفة كل دورة)
+    # إنشاء seed للعشوائية بناءً على الرحلة والمستخدم (لضمان ثبات الهوايات)
     import random
-    random.seed(current_cycle)
+    random.seed(f"{user_id}_{current_cycle}")
     
-    # خلط الهوايات بطريقة عشوائية لهذه الدورة
+    # خلط الهوايات بطريقة عشوائية لهذه الرحلة
     cycle_hobbies = hobbies.copy()
     random.shuffle(cycle_hobbies)
     
@@ -876,13 +916,13 @@ def daily_hobby():
     remaining_days = cycle_length - day_in_cycle
     total_hobbies_shown = min((day_in_cycle + 1) * hobbies_per_day, len(hobbies))
     
-    # رسالة توضيحية
+    # رسالة توضيحية شخصية
     if day_in_cycle == 0:
-        message = f"🎉 رحلة اكتشاف جديدة! 4 هوايات فريدة لك اليوم من أصل {len(hobbies)} هواية"
+        message = f"🎉 رحلة اكتشاف جديدة! اليوم {user_day} - 4 هوايات فريدة من أصل {len(hobbies)} هواية"
     elif remaining_days == 1:
-        message = f"🔥 آخر يوم في رحلة الاكتشاف! غداً ستبدأ رحلة جديدة بترتيب مختلف"
+        message = f"🔥 آخر يوم في رحلة الاكتشاف! غداً ستبدأ رحلة جديدة - اليوم {user_day}"
     else:
-        message = f"✨ هوايات اليوم ({total_hobbies_shown}/{len(hobbies)}) - باقي {remaining_days} أيام في رحلة الاكتشاف"
+        message = f"✨ اليوم {user_day} - هوايات يومك ({total_hobbies_shown}/{len(hobbies)}) - باقي {remaining_days} أيام في رحلة الاكتشاف"
     
     return {
         "hobbies": daily_hobbies,
@@ -892,7 +932,9 @@ def daily_hobby():
             "day_in_cycle": day_in_cycle + 1,
             "remaining_days": remaining_days,
             "total_hobbies_shown": total_hobbies_shown,
-            "cycle_progress": f"{total_hobbies_shown}/{len(hobbies)}"
+            "cycle_progress": f"{total_hobbies_shown}/{len(hobbies)}",
+            "user_day": user_day,  # 🔥 اليوم الشخصي للمستخدم
+            "user_id": user_id
         },
         "system": SYSTEM_MODE
     }
