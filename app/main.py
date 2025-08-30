@@ -868,6 +868,7 @@ def daily_hobby(current_user = Depends(get_current_user)):
         
         # 🔥 حساب أيام المستخدم منذ التسجيل
         user_start_date = None
+        user_day = 1  # القيمة الافتراضية
         
         # محاولة الحصول على تاريخ التسجيل من قاعدة البيانات
         if DATABASE_AVAILABLE and SessionLocal:
@@ -877,28 +878,27 @@ def daily_hobby(current_user = Depends(get_current_user)):
                 if user and hasattr(user, 'created_at') and user.created_at:
                     user_start_date = user.created_at
                     print(f"📅 User start date from DB: {user_start_date}")
+                    
+                    # حساب عدد الأيام منذ بداية رحلة المستخدم
+                    today = datetime.now().date()
+                    if hasattr(user_start_date, 'date'):
+                        user_start_date = user_start_date.date()
+                    
+                    days_since_start = (today - user_start_date).days
+                    user_day = max(1, days_since_start + 1)  # على الأقل اليوم 1
+                    
+                    print(f"✅ User {user_id}: Registered on {user_start_date}, today is day {user_day}")
+                else:
+                    print(f"⚠️ User {user_id} not found in DB or no created_at, using day 1")
+                    user_day = 1
             except Exception as e:
-                print(f"⚠️ Could not get user start date: {e}")
+                print(f"⚠️ Could not get user start date: {e}, defaulting to day 1")
+                user_day = 1
             finally:
                 db.close()
-        
-        # إذا لم نجد تاريخ التسجيل، استخدم تاريخ افتراضي مبني على user_id
-        if not user_start_date:
-            # تاريخ افتراضي: 1 يناير 2024 + عدد أيام = user_id
-            from datetime import date, timedelta
-            base_date = date(2024, 1, 1)
-            user_start_date = base_date + timedelta(days=user_id % 365)
-            print(f"📅 Using calculated start date: {user_start_date}")
-        
-        # حساب عدد الأيام منذ بداية رحلة المستخدم
-        today = datetime.now().date()
-        if hasattr(user_start_date, 'date'):
-            user_start_date = user_start_date.date()
-        
-        days_since_start = (today - user_start_date).days
-        
-        # المستخدم في اليوم رقم (days_since_start + 1)
-        user_day = days_since_start + 1
+        else:
+            print(f"⚠️ Database not available, new user starts at day 1")
+            user_day = 1
         
         print(f"👤 User {user_id}: Day {user_day} of their journey")
     
@@ -1241,3 +1241,58 @@ if not os.path.exists(AVATARS_DIR):
     
 # Mount the avatars directory
 app.mount("/avatars", StaticFiles(directory=AVATARS_DIR), name="avatars")
+
+@app.post("/api/debug/reset-user-journey")
+def reset_user_journey():
+    """Reset user journey to start from today (Day 1)."""
+    try:
+        if DATABASE_AVAILABLE and SessionLocal:
+            db = SessionLocal()
+            try:
+                from datetime import datetime
+                
+                # العثور على جميع المستخدمين
+                users = db.query(User).all()
+                
+                if not users:
+                    return {
+                        "message": "No users found in database",
+                        "users_updated": 0
+                    }
+                
+                updated_users = []
+                today = datetime.now()
+                
+                for user in users:
+                    old_created_at = user.created_at if hasattr(user, 'created_at') else None
+                    
+                    # تحديث created_at لليوم الحالي (ليبدأ من اليوم 1)
+                    user.created_at = today
+                    
+                    updated_users.append({
+                        "user_id": user.id,
+                        "username": user.username,
+                        "old_created_at": str(old_created_at) if old_created_at else "None",
+                        "new_created_at": str(today),
+                        "user_code": user.user_code
+                    })
+                
+                db.commit()
+                
+                return {
+                    "message": f"Successfully reset journey for {len(updated_users)} users to start from Day 1",
+                    "updated_users": updated_users,
+                    "total_users": len(users),
+                    "new_start_date": str(today.date())
+                }
+                
+            finally:
+                db.close()
+        else:
+            return {
+                "error": "Database not available",
+                "suggestion": "This reset is only needed when using real database"
+            }
+            
+    except Exception as e:
+        return {"error": str(e)}
