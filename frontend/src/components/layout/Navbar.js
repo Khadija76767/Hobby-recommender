@@ -184,6 +184,7 @@ const Navbar = () => {
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar
+                    key={currentUser.avatar_url || 'default'} // 🔥 إجبار إعادة التحديث
                     alt={currentUser.display_name || currentUser.full_name || 'User'}
                     src={currentUser.avatar_url || '/assets/images/default-avatar.png'}
                     sx={{ bgcolor: theme.palette.primary.main }}

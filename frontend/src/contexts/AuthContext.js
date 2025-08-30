@@ -262,6 +262,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     currentUser,
+    setCurrentUser, // إضافة setCurrentUser للوصول المباشر
     token,
     loading,
     isAuthenticated: !!token && !!currentUser, // إضافة isAuthenticated

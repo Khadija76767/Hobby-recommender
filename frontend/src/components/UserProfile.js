@@ -17,7 +17,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useAuth } from '../contexts/AuthContext';
 
 const UserProfile = () => {
-  const { api, updateUserData, currentUser } = useAuth();
+  const { api, updateUserData, currentUser, setCurrentUser } = useAuth();
   const [profile, setProfile] = useState({
     display_name: '',
     avatar_url: '',
@@ -34,59 +34,71 @@ const UserProfile = () => {
   }, [currentUser]); // Add currentUser as dependency
 
   const fetchProfile = async () => {
-    try {
-      // 🔥 فحص إذا كان api متاح
-      if (!api) {
-        console.log('API not available, using currentUser data');
-        throw new Error('API not available');
-      }
-
-      // 🔥 محاولة استرجاع البيانات من API أولاً
-      const response = await api.get('/api/auth/profile');
-      setProfile(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
+    // 🔥 فحص إذا كان api متاح
+    if (!api) {
+      setNotification({
+        type: 'info',
+        message: 'Profile loading temporarily unavailable. Please try again later.',
+      });
       
-      // 🔥 إذا فشل API، استخدم بيانات المستخدم من AuthContext
+      // 🔥 استخدام بيانات currentUser كـ fallback
       if (currentUser) {
         console.log('🔄 Using currentUser data as fallback:', currentUser);
-        
-        // 🔥 استخدام بيانات المستخدم الحقيقية من AuthContext
-        const fallbackProfile = {
+        setProfile({
           display_name: currentUser.display_name || currentUser.username || '',
           avatar_url: currentUser.avatar_url || '',
           user_code: currentUser.user_code || '',
-        };
-        
-        setProfile(fallbackProfile);
-        setLoading(false);
-      } else {
-        // 🔥 إذا لم يكن هناك مستخدم، إنشاء بروفايل فارغ
-        setProfile({
-          display_name: '',
-          avatar_url: '',
-          user_code: 'NEW_USER',
         });
-        setNotification({
-          type: 'error',
-          message: 'Please log in to access your profile.',
-        });
-        setLoading(false);
       }
+      
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await api.get('/api/auth/me');
+      setProfile(response.data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      
+      // 🔥 استخدام بيانات currentUser كـ fallback
+      if (currentUser) {
+        console.log('🔄 Using currentUser data as fallback:', currentUser);
+        setProfile({
+          display_name: currentUser.display_name || currentUser.username || '',
+          avatar_url: currentUser.avatar_url || '',
+          user_code: currentUser.user_code || '',
+        });
+      }
+      
+      setNotification({
+        type: 'error',
+        message: 'Failed to load profile. Using cached data.',
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSave = async () => {
+    if (!api) {
+      setNotification({
+        type: 'error',
+        message: 'Profile update temporarily unavailable. Please try again later.',
+      });
+      return;
+    }
+
     try {
-      // 🔥 محاولة حفظ البيانات عبر API أولاً
       await api.post('/api/auth/profile', {
         display_name: profile.display_name,
       });
-      
-      // Update user data in context
-      await updateUserData();
-      
+
+      // Update context after successful save
+      if (updateUserData) {
+        await updateUserData();
+      }
+
       setIsEditing(false);
       setNotification({
         type: 'success',
@@ -94,31 +106,10 @@ const UserProfile = () => {
       });
     } catch (error) {
       console.error('Error updating profile:', error);
-      
-      // 🔥 إذا فشل API، احفظ البيانات محلياً مع ربطها بالمستخدم
-      if (currentUser) {
-        const userKey = `profile_user_${currentUser.id}`;
-        const profileData = {
-          display_name: profile.display_name,
-          avatar_url: profile.avatar_url,
-          user_code: profile.user_code,
-          userId: currentUser.id,
-          lastUpdated: new Date().toISOString()
-        };
-        
-        localStorage.setItem(userKey, JSON.stringify(profileData));
-        
-        setIsEditing(false);
-        setNotification({
-          type: 'success',
-          message: 'Profile saved locally! (No internet connection)',
-        });
-      } else {
-        setNotification({
-          type: 'error',
-          message: 'Please log in to save your profile.',
-        });
-      }
+      setNotification({
+        type: 'error',
+        message: 'Failed to update profile. Please try again.',
+      });
     }
   };
 
@@ -146,10 +137,28 @@ const UserProfile = () => {
         },
       });
 
-      // Update both local state and context
-      setProfile(prev => ({ ...prev, avatar_url: response.data.avatar_url }));
+      const newAvatarUrl = response.data.avatar_url;
+      console.log('✅ New avatar URL:', newAvatarUrl);
+
+      // 🔥 تحديث الـ state المحلي
+      setProfile(prev => ({ ...prev, avatar_url: newAvatarUrl }));
+
+      // 🔥 تحديث currentUser مباشرة في AuthContext
+      if (setCurrentUser && currentUser) {
+        const updatedUser = {
+          ...currentUser,
+          avatar_url: newAvatarUrl
+        };
+        setCurrentUser(updatedUser);
+        
+        // 🔥 حفظ في localStorage أيضاً
+        localStorage.setItem('userData', JSON.stringify(updatedUser));
+        console.log('✅ Updated currentUser with new avatar:', updatedUser);
+      }
+
+      // 🔥 تحديث البيانات من API أيضاً (اختياري)
       if (updateUserData) {
-        await updateUserData();
+        setTimeout(() => updateUserData(), 500); // تأخير قصير للتأكد من التحديث
       }
 
       setNotification({
