@@ -105,16 +105,17 @@ const DailyHobbies = ({ onHobbySelect }) => {
     <Box>
       {/* عنوان الهوايات اليومية */}
       <Paper 
-        elevation={6}
+        elevation={3}
         sx={{ 
           p: 4, 
           mb: 4, 
-          background: 'linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 50%, #45B7D1 100%)',
-          color: 'white',
+          background: 'linear-gradient(135deg, #FFB5E8 0%, #B5E8FF 50%, #E8B5FF 100%)',
+          color: '#4A4A4A',
           textAlign: 'center',
           borderRadius: 4,
           position: 'relative',
           overflow: 'hidden',
+          border: '2px solid rgba(255,255,255,0.3)',
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -122,24 +123,21 @@ const DailyHobbies = ({ onHobbySelect }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+            background: 'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.2) 0%, transparent 50%)',
             pointerEvents: 'none'
           }
         }}
       >
         <Box sx={{ position: 'relative', zIndex: 1 }}>
-          <CalendarToday sx={{ fontSize: 50, mb: 2, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
+          <CalendarToday sx={{ fontSize: 50, mb: 2, color: '#4A4A4A' }} />
           <Typography 
             variant="h3" 
             fontWeight="bold" 
             gutterBottom
             sx={{ 
-              textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-              background: 'linear-gradient(45deg, #FFE066, #FF6B6B)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+              color: '#4A4A4A',
+              fontFamily: 'Patrick Hand',
+              textShadow: '0 1px 2px rgba(74,74,74,0.2)'
             }}
           >
             🎯 هوايات اليوم
@@ -147,10 +145,10 @@ const DailyHobbies = ({ onHobbySelect }) => {
           <Typography 
             variant="h6" 
             sx={{ 
-              opacity: 0.95,
+              color: '#6B6B6B',
               fontWeight: 500,
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-              mb: 3
+              mb: 3,
+              fontFamily: 'Quicksand'
             }}
           >
             {message}
@@ -161,63 +159,63 @@ const DailyHobbies = ({ onHobbySelect }) => {
               <Grid container spacing={2} justifyContent="center">
                 <Grid item>
                   <Paper
-                    elevation={3}
+                    elevation={2}
                     sx={{ 
                       px: 3, 
                       py: 1.5, 
-                      background: 'rgba(255,255,255,0.25)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255,255,255,0.3)',
+                      background: 'rgba(255,255,255,0.95)',
+                      border: '1px solid #FFB5E8',
                       borderRadius: 3,
-                      textAlign: 'center'
+                      textAlign: 'center',
+                      boxShadow: '0 2px 8px rgba(255,181,232,0.2)'
                     }}
                   >
-                    <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
+                    <Typography variant="h6" fontWeight="bold" sx={{ color: '#4A4A4A', fontFamily: 'Patrick Hand' }}>
                       🌟 الرحلة {cycleInfo.current_cycle}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                    <Typography variant="body2" sx={{ color: '#6B6B6B', fontFamily: 'Quicksand' }}>
                       مجموعة الاكتشاف
                     </Typography>
                   </Paper>
                 </Grid>
                 <Grid item>
                   <Paper
-                    elevation={3}
+                    elevation={2}
                     sx={{ 
                       px: 3, 
                       py: 1.5, 
-                      background: 'rgba(255,255,255,0.25)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255,255,255,0.3)',
+                      background: 'rgba(255,255,255,0.95)',
+                      border: '1px solid #B5E8FF',
                       borderRadius: 3,
-                      textAlign: 'center'
+                      textAlign: 'center',
+                      boxShadow: '0 2px 8px rgba(181,232,255,0.2)'
                     }}
                   >
-                    <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
+                    <Typography variant="h6" fontWeight="bold" sx={{ color: '#4A4A4A', fontFamily: 'Patrick Hand' }}>
                       📅 اليوم {cycleInfo.day_in_cycle}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                    <Typography variant="body2" sx={{ color: '#6B6B6B', fontFamily: 'Quicksand' }}>
                       من أصل 14 يوم
                     </Typography>
                   </Paper>
                 </Grid>
                 <Grid item>
                   <Paper
-                    elevation={3}
+                    elevation={2}
                     sx={{ 
                       px: 3, 
                       py: 1.5, 
-                      background: 'rgba(255,255,255,0.25)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255,255,255,0.3)',
+                      background: 'rgba(255,255,255,0.95)',
+                      border: '1px solid #E8B5FF',
                       borderRadius: 3,
-                      textAlign: 'center'
+                      textAlign: 'center',
+                      boxShadow: '0 2px 8px rgba(232,181,255,0.2)'
                     }}
                   >
-                    <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
+                    <Typography variant="h6" fontWeight="bold" sx={{ color: '#4A4A4A', fontFamily: 'Patrick Hand' }}>
                       🎯 {cycleInfo.cycle_progress}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                    <Typography variant="body2" sx={{ color: '#6B6B6B', fontFamily: 'Quicksand' }}>
                       تقدمك الكلي
                     </Typography>
                   </Paper>
