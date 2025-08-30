@@ -104,7 +104,18 @@ const UserProfile = () => {
         
         // حفظ في localStorage أيضاً
         localStorage.setItem('userData', JSON.stringify(updatedUser));
+        
+        // 🔥 تحديث إضافي لـ RobotAssistant
+        const userKey = `userName_user_${currentUser.id}`;
+        localStorage.setItem(userKey, profile.display_name);
+        
+        // 🔥 إرسال event مخصص لإجبار التحديث
+        window.dispatchEvent(new CustomEvent('userProfileUpdated', {
+          detail: { newDisplayName: profile.display_name }
+        }));
+        
         console.log('✅ Updated currentUser with new display_name:', updatedUser);
+        console.log('🔄 Dispatched userProfileUpdated event');
       }
 
       // Update context after successful save (optional - for API sync)

@@ -105,37 +105,47 @@ const RobotAssistant = ({ onMoodChange }) => {
 
   // 🔥 تحديث البيانات عند تغيير المستخدم أو البروفايل
   useEffect(() => {
+    console.log('🐼 RobotAssistant useEffect triggered:', { 
+      currentUser: currentUser?.username, 
+      display_name: currentUser?.display_name,
+      current_userName: userName 
+    });
+
     if (currentUser) {
       const userKey = `userName_user_${currentUser.id}`;
       
       // 🔥 إعطاء أولوية للاسم من البروفايل (display_name) دائماً
       const profileName = currentUser.display_name || currentUser.username;
       
-      if (profileName) {
-        // استخدم الاسم من البروفايل مباشرة
-        setUserName(profileName);
-        localStorage.setItem(userKey, profileName); // احفظه للمرة القادمة
-        setShowNameInput(false);
-        console.log(`🏷️ Updated user name from profile: ${profileName}`);
+      console.log(`🏷️ Profile name detected: "${profileName}"`);
+      
+      if (profileName && profileName.trim() !== '') {
+        // إذا كان الاسم مختلف عن الحالي، حديثه
+        if (profileName !== userName) {
+          console.log(`🔄 Updating name from "${userName}" to "${profileName}"`);
+          setUserName(profileName);
+          localStorage.setItem(userKey, profileName);
+          setShowNameInput(false);
+        }
       } else {
         // إذا لم يكن هناك اسم في البروفايل، تحقق من localStorage
         const savedName = localStorage.getItem(userKey);
-        if (savedName) {
+        if (savedName && savedName !== userName) {
+          console.log(`🏷️ Loading saved name: "${savedName}"`);
           setUserName(savedName);
           setShowNameInput(false);
-          console.log(`🏷️ Loaded saved name: ${savedName}`);
-        } else {
+        } else if (!savedName) {
           // اطلب من المستخدم إدخال اسم
+          console.log('🏷️ No name found, requesting input');
           setUserName('');
           setShowNameInput(true);
-          console.log('🏷️ No name found, requesting input');
         }
       }
     } else {
       setUserName('');
       setShowNameInput(false);
     }
-  }, [currentUser, currentUser?.display_name]); // 🔥 مراقبة display_name أيضاً
+  }, [currentUser, currentUser?.display_name, currentUser?.username]); // 🔥 مراقبة كل البيانات
 
   // 🔥 مراقبة تغيير display_name تحديداً (للتحديث الفوري)
   useEffect(() => {
@@ -155,36 +165,57 @@ const RobotAssistant = ({ onMoodChange }) => {
     }
   }, [currentUser?.display_name]); // مراقبة display_name فقط
 
-  // 🔥 مراقبة تغيير localStorage (عند تحديث البروفايل من مكان آخر)
+  // 🔥 مراقبة متقدمة لتحديثات البيانات (للتأكد من التحديث الفوري)
   useEffect(() => {
-    const handleStorageChange = (event) => {
-      if (event.key === 'userData' && currentUser) {
+    if (!currentUser) return;
+
+    const checkForUpdates = () => {
+      const userDataString = localStorage.getItem('userData');
+      if (userDataString) {
         try {
-          const updatedUserData = JSON.parse(event.newValue);
-          if (updatedUserData && updatedUserData.id === currentUser.id) {
-            const newDisplayName = updatedUserData.display_name || updatedUserData.username;
+          const userData = JSON.parse(userDataString);
+          if (userData.id === currentUser.id) {
+            const newDisplayName = userData.display_name || userData.username;
             if (newDisplayName && newDisplayName !== userName) {
+              console.log(`🚀 Force update detected: "${userName}" → "${newDisplayName}"`);
               setUserName(newDisplayName);
               
-              // تحديث localStorage أيضاً لـ RobotAssistant
+              // حفظ أيضاً في مفتاح RobotAssistant
               const userKey = `userName_user_${currentUser.id}`;
               localStorage.setItem(userKey, newDisplayName);
-              
-              console.log(`🔄 Name updated from storage change: ${newDisplayName}`);
             }
           }
         } catch (error) {
-          console.error('Error parsing storage change:', error);
+          console.error('❌ Error parsing userData:', error);
         }
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
+    // فحص فوري
+    checkForUpdates();
+
+    // فحص دوري كل ثانية (للتأكد من عدم تفويت أي تحديث)
+    const interval = setInterval(checkForUpdates, 1000);
+
+    return () => clearInterval(interval);
+  }, [currentUser?.id, userName]);
+
+  // 🔥 مستمع للتحديثات الفورية من البروفايل
+  useEffect(() => {
+    const handleProfileUpdate = (event) => {
+      const newDisplayName = event.detail?.newDisplayName;
+      if (newDisplayName && newDisplayName !== userName) {
+        console.log(`🎯 Profile update event received: "${newDisplayName}"`);
+        setUserName(newDisplayName);
+      }
+    };
+
+    window.addEventListener('userProfileUpdated', handleProfileUpdate);
     
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userProfileUpdated', handleProfileUpdate);
     };
-  }, [currentUser, userName]);
+  }, [userName]);
 
   const handleSpeak = async (text) => {
     setSpeaking(true);
